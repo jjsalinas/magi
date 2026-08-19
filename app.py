@@ -1,289 +1,90 @@
-import asyncio
-import json
-import os
+"""
+MAGI DECISION SUPPORT SYSTEM — FastAPI entrypoint.
+
+Serves the static frontend and exposes /api/decide, which runs a
+multi-round, 3-persona LLM deliberation (see magi/engine.py) against
+an OpenAI-compatible endpoint (e.g. LM Studio's local server).
+
+Run with:  uvicorn app:app --reload
+"""
+
 import sys
 from pathlib import Path
-from typing import TypedDict
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from openai import AsyncOpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-## Python 3.14 check
+from magi.config import MAX_ROUNDS, MODEL_ID, OPEN_AI_API_KEY, OPEN_AI_BASE_URL, validate_environment
+from magi.engine import deliberate
+
 if sys.version_info[:2] != (3, 14):
-    raise RuntimeError(
-        f"This project requires Python 3.14, found {sys.version.split()[0]}"
-    )
-
-## read .env file
-load_dotenv()
-
-app = FastAPI(title="MAGI")
-
-MODEL = os.getenv("MODEL_ID")
-
-# ---------------------------------------------------------
-# TYPE DEFINITIONS
-# ---------------------------------------------------------
+    raise RuntimeError(f"This project requires Python 3.14, found {sys.version.split()[0]}")
 
 
-class MemberConfig(TypedDict):
-    """Defines the structure for a single MAGI member's configuration."""
+def setup_client() -> AsyncOpenAI:
+    print(f"\n{'=' * 60}\n MAGI SYSTEM INITIALIZATION\n{'=' * 60}\n")
 
-    name: str
-    role: str
-    color: str
-    prompt: str
+    validate_environment()
 
+    client = AsyncOpenAI(base_url=OPEN_AI_BASE_URL, api_key=OPEN_AI_API_KEY)
 
-# ---------------------------------------------------------
-# MEMBER DEFINITIONS
-# ---------------------------------------------------------
-
-
-def define_melchior() -> MemberConfig:
-    """Defines the configuration for Melchior."""
-    return {
-        "name": "MELCHIOR",
-        "role": "LOGIC",
-        "color": "#ff3030",
-        "prompt": """
-You are MELCHIOR, the logical and scientific member of a
-three-part decision system.
-
-Analyze the proposition using:
-- logic
-- evidence
-- consistency
-- probabilities
-- expected outcomes
-
-Do not focus primarily on emotions or morality.
-
-You must make an independent decision.
-
-Return ONLY valid JSON in this exact format:
-
-{
-  "decision": "YES" or "NO",
-  "confidence": number between 0 and 1,
-  "reason": "short explanation"
-}
-""",
-    }
-
-
-def define_balthasar() -> MemberConfig:
-    """Defines the configuration for Balthasar."""
-    return {
-        "name": "BALTHASAR",
-        "role": "PRACTICAL",
-        "color": "#ff9d00",
-        "prompt": """
-You are BALTHASAR, the practical member of a three-part
-decision system.
-
-Analyze the proposition using:
-- feasibility
-- cost
-- resources
-- risks
-- implementation difficulty
-- likely real-world consequences
-
-Think like an experienced engineer or operator.
-
-You must make an independent decision.
-
-Return ONLY valid JSON in this exact format:
-
-{
-  "decision": "YES" or "NO",
-  "confidence": number between 0 and 1,
-  "reason": "short explanation"
-}
-""",
-    }
-
-
-def define_casper() -> MemberConfig:
-    """Defines the configuration for Casper."""
-    return {
-        "name": "CASPER",
-        "role": "ETHICS",
-        "color": "#ffe600",
-        "prompt": """
-You are CASPER, the ethical and human member of a
-three-part decision system.
-
-Analyze the proposition using:
-- harm
-- fairness
-- autonomy
-- responsibility
-- human consequences
-- ethical principles
-
-You must make an independent decision.
-
-Return ONLY valid JSON in this exact format:
-
-{
-  "decision": "YES" or "NO",
-  "confidence": number between 0 and 1,
-  "reason": "short explanation"
-}
-""",
-    }
-
-
-# ---------------------------------------------------------
-# FINAL CONFIGURATION ASSEMBLY
-# ---------------------------------------------------------
-
-MAGI: dict[str, MemberConfig] = {
-    "melchior": define_melchior(),
-    "balthasar": define_balthasar(),
-    "casper": define_casper(),
-}
-
-
-# ---------------------------------------------------------
-# SETUP AND INITIALIZATION
-# ---------------------------------------------------------
-
-
-def setup_client():
-    """Initializes the OpenAI client and validates required environment variables."""
-
-    required_vars = {
-        "MODEL_ID": "The model identifier (e.g., liquid/lfm2.5-1.2b)",
-        "OPEN_AI_BASE_URL": "The base URL for the API endpoint",
-        "OPEN_AI_API_KEY": "The API key or token",
-    }
-
-    print("--- Starting MAGI Setup ---")
-
-    # Check for required variables
-    for var, description in required_vars.items():
-        value = os.getenv(var)
-        if not value:
-            raise ValueError(
-                f"FATAL ERROR: Environment variable '{var}' is missing. {description}"
-            )
-
-    client = AsyncOpenAI(
-        base_url=os.getenv("OPEN_AI_BASE_URL"),
-        api_key=os.getenv("OPEN_AI_API_KEY"),
-    )
-    print("✅ Environment variables loaded successfully.")
+    print("ENVIRONMENT ............ ONLINE")
+    print(f"MODEL .................. {MODEL_ID}")
+    print(f"DELIBERATION LIMIT ..... {MAX_ROUNDS} ROUNDS")
+    print("MELCHIOR ............... ONLINE")
+    print("BALTHASAR .............. ONLINE")
+    print("CASPER ................. ONLINE")
+    print("\nMAGI SYSTEM READY.\n")
 
     return client
 
 
 try:
     client = setup_client()
-except ValueError as e:
-    print(e)
-    exit(1)
+except ValueError as exc:
+    print(exc)
+    raise SystemExit(1)
 
-# Maps URL /static to physical directory ./static
+
+app = FastAPI(title="MAGI")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-# ---------------------------------------------------------
-# API
-# ---------------------------------------------------------
-
-
 class DecisionRequest(BaseModel):
-    question: str
-
-
-async def ask_magi(member: MemberConfig, question: str) -> dict:
-    """Sends the prompt to the LLM and parses the JSON response."""
-    response = await client.chat.completions.create(
-        model=MODEL,
-        temperature=0.4,
-        messages=[
-            {
-                "role": "system",
-                "content": member["prompt"],
-            },
-            {
-                "role": "user",
-                "content": f"""
-Proposition to evaluate:
-
-{question}
-
-Make your decision independently.
-""",
-            },
-        ],
-    )
-
-    text = response.choices[0].message.content.strip()
-
-    # Handle models that put JSON inside ```json ... ```
-    if text.startswith("```"):
-        text = text.replace("```json", "")
-        text = text.replace("```", "")
-        text = text.strip()
-
-    try:
-        result = json.loads(text)
-    except json.JSONDecodeError:
-        result = {
-            "decision": "UNKNOWN",
-            "confidence": 0,
-            "reason": text,
-        }
-
-    # Ensure the result dictionary is correctly typed and augmented
-    result["member"] = member["name"]
-    result["role"] = member["role"]
-
-    return result
+    question: str = Field(min_length=1)
 
 
 @app.post("/api/decide")
 async def decide(request: DecisionRequest):
-
     question = request.question.strip()
 
     if not question:
-        return {"error": "No proposition supplied."}
+        return {"error": "No question supplied."}
 
-    # All three deliberate independently and concurrently.
-    results = await asyncio.gather(
-        ask_magi(MAGI["melchior"], question),
-        ask_magi(MAGI["balthasar"], question),
-        ask_magi(MAGI["casper"], question),
-    )
+    try:
+        state = await deliberate(client, question)
+    except Exception as exc:
+        print(f"\n{'=' * 60}\n MAGI SYSTEM FAILURE\n{'=' * 60}")
+        print(f"{type(exc).__name__}: {exc}")
+        print("=" * 60)
 
-    yes = sum(1 for result in results if result["decision"].upper() == "YES")
-
-    no = sum(1 for result in results if result["decision"].upper() == "NO")
-
-    if yes >= 2:
-        decision = "YES"
-    elif no >= 2:
-        decision = "NO"
-    else:
-        decision = "UNRESOLVED"
+        return {"error": "MAGI deliberation failed.", "detail": str(exc)}
 
     return {
         "question": question,
-        "decision": decision,
-        "votes": {
-            "yes": yes,
-            "no": no,
+        "decision": state["decision"],
+        "votes": state["votes"],
+        "members": state["members"],
+        "state": {
+            "session_id": state["session_id"],
+            "phase": state["phase"],
+            "round": state["round"],
+            "max_rounds": state["max_rounds"],
         },
-        "members": results,
+        "rounds": state["rounds"],
     }
 
 
