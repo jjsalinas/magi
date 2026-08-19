@@ -37,13 +37,10 @@ function setSystemSign(status) {
 
 function resetMember(id) {
   const node = document.getElementById(id);
-
   node.classList.remove("thinking", "voted");
 
   document.getElementById(id + "-status").textContent = "STANDBY";
-
   document.getElementById(id + "-reason").textContent = "Awaiting proposition.";
-
   document.getElementById(id + "-confidence").textContent = "";
 }
 
@@ -83,17 +80,13 @@ function normalizeDecision(value) {
 
 function showResult(result) {
   const id = result.member.toLowerCase();
-
   const node = document.getElementById(id);
-
   const decision = normalizeDecision(result.decision);
 
   node.classList.remove("thinking");
-
   node.classList.add("voted");
 
   document.getElementById(id + "-status").textContent = decision || "INVALID";
-
   document.getElementById(id + "-reason").textContent = result.reason || "";
 
   if (typeof result.confidence === "number") {
@@ -138,7 +131,6 @@ form.addEventListener("submit", async (event) => {
   }
 
   submit.disabled = true;
-
   submit.textContent = "DELIBERATING...";
 
   /* -----------------------------------------------
@@ -146,7 +138,6 @@ form.addEventListener("submit", async (event) => {
        ----------------------------------------------- */
 
   members.forEach(resetMember);
-
   members.forEach(setThinking);
 
   /*
@@ -163,13 +154,9 @@ form.addEventListener("submit", async (event) => {
        ----------------------------------------------- */
 
   document.getElementById("case-question").textContent = question;
-
   document.getElementById("case-decision").textContent = "DELIBERATING...";
-
   document.getElementById("case-decision").style.color = "";
-
   document.getElementById("case-decision").style.textShadow = "";
-
   document.getElementById("case-votes").textContent = "";
 
   /* -----------------------------------------------
@@ -179,11 +166,9 @@ form.addEventListener("submit", async (event) => {
   try {
     const response = await fetch("/api/decide", {
       method: "POST",
-
       headers: {
         "Content-Type": "application/json",
       },
-
       body: JSON.stringify({ question }),
     });
 
@@ -200,13 +185,11 @@ form.addEventListener("submit", async (event) => {
     /* -------------------------------------------
            MEMBER RESULTS
            ------------------------------------------- */
-
     data.members.forEach(showResult);
 
     /* -------------------------------------------
            COUNT ACTUAL MEMBER VOTES
            ------------------------------------------- */
-
     const normalizedMembers = data.members.map((member) => ({
       ...member,
 
@@ -240,17 +223,13 @@ form.addEventListener("submit", async (event) => {
            ------------------------------------------- */
 
     const conclusion = document.getElementById("case-decision");
-
     conclusion.textContent = finalDecision;
-
     colorDecision(conclusion, finalDecision);
-
     document.getElementById("case-votes").textContent = `${yes} YES / ${no} NO`;
 
     /*
      * Update the Evangelion-style status sign.
      */
-
     setSystemSign(finalDecision);
 
     /* -------------------------------------------
@@ -268,13 +247,9 @@ form.addEventListener("submit", async (event) => {
     console.error(error);
 
     const conclusion = document.getElementById("case-decision");
-
     conclusion.textContent = "SYSTEM ERROR";
-
     conclusion.style.color = "var(--red)";
-
     conclusion.style.textShadow = "0 0 20px var(--red)";
-
     document.getElementById("case-votes").textContent = error.message;
 
     /*
