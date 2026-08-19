@@ -1,2015 +1,222 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MAGI SYSTEM</title>
-
-<style>
-
-:root {
-    --orange: #ff9d00;
-    --orange-dark: #8a4e00;
-    --cyan: #45afd0;
-    --green: #00ff88;
-    --red: #ff3030;
-    --yellow: #ffe600;
-    --black: #050505;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-}
-
-body {
-    background: var(--black);
-    color: #ddd;
-    font-family: "Courier New", monospace;
-    overflow-x: hidden;
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: .08;
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent 0,
-            transparent 3px,
-            #fff 4px
-        );
-    z-index: 100;
-}
-
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: .10;
-    background:
-        repeating-linear-gradient(
-            135deg,
-            #ff9d00 0,
-            #ff9d00 8px,
-            transparent 8px,
-            transparent 18px
-        );
-    mask-image:
-        linear-gradient(
-            to bottom,
-            #000 0,
-            transparent 30px,
-            transparent calc(100% - 30px),
-            #000 100%
-        );
-    z-index: 101;
-}
-
-
-/* =========================================================
-   MAIN FRAME
-   ========================================================= */
-
-.container {
-    width: min(1200px, 96vw);
-    margin: 10px auto;
-    padding: 12px;
-    border: 2px solid var(--orange);
-    position: relative;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent 49.8%,
-            rgba(255, 157, 0, .04) 50%,
-            transparent 50.2%
-        );
-}
-
-.container::before {
-    content: "";
-    position: absolute;
-    inset: 5px;
-    border: 1px solid var(--orange-dark);
-    pointer-events: none;
-    z-index: 20;
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.header {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr 1.4fr 1fr;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.header-panel {
-    min-height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: var(--orange);
-
-    border-top: 2px solid var(--orange);
-    border-bottom: 2px solid var(--orange);
-
-    font-family: Georgia, serif;
-    font-size: clamp(2rem, 5vw, 4rem);
-    font-weight: bold;
-    letter-spacing: .08em;
-
-    text-shadow:
-        0 0 8px rgba(255, 157, 0, .5);
-}
-
-.header-panel.left {
-    justify-content: flex-start;
-    padding-left: 35px;
-}
-
-.header-panel.right {
-    justify-content: flex-end;
-    padding-right: 35px;
-}
-
-.header-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid #333;
-
-    color: #555;
-    font-size: .7rem;
-    letter-spacing: .3em;
-}
-
-
-/* =========================================================
-   SYSTEM FRAME
-   ========================================================= */
-
-.system-frame {
-    position: relative;
-    border: 1px solid var(--orange-dark);
-    padding: 18px 15px 10px;
-
-    background:
-        linear-gradient(
-            rgba(0, 255, 100, .02),
-            rgba(0, 0, 0, 0)
-        );
-}
-
-
-/* =========================================================
-   SYSTEM INFO
-   ========================================================= */
-
-.system-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-
-    color: var(--orange);
-
-    font-size: .72rem;
-    line-height: 1.35;
-
-    margin-bottom: 8px;
-}
-
-.system-info-right {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    min-height: 58px;
-
-    color: #00aaff;
-    text-align: right;
-}
-
-
-/* =========================================================
-   EVANGELION-STYLE STATUS SIGN
-   ========================================================= */
-
-.status-sign {
-    display: inline-flex;
-
-    flex-direction: column;
-    align-items: stretch;
-
-    min-width: 120px;
-
-    padding: 5px 8px;
-
-    border: 1px solid #00a86b;
-
-    outline: 1px solid rgba(0, 168, 107, .35);
-    outline-offset: 3px;
-
-    color: #00d982;
-
-    background: rgba(0, 40, 25, .18);
-
-    text-align: center;
-
-    font-weight: bold;
-    letter-spacing: .08em;
-
-    text-shadow:
-        0 0 6px currentColor;
-
-    transition:
-        color .2s,
-        border-color .2s,
-        box-shadow .2s;
-}
-
-.status-sign-jp {
-    padding-bottom: 4px;
-
-    border-bottom: 1px solid currentColor;
-
-    font-family:
-        "Noto Sans JP",
-        "Yu Gothic",
-        sans-serif;
-
-    font-size: .9rem;
-    line-height: 1;
-}
-
-.status-sign-value {
-    padding-top: 5px;
-
-    font-size: .62rem;
-    line-height: 1;
-}
-
-
-/* YES */
-
-.status-sign.yes {
-    color: #00ff88;
-    border-color: #00ff88;
-
-    box-shadow:
-        0 0 8px rgba(0, 255, 136, .25);
-}
-
-
-/* NO */
-
-.status-sign.no {
-    color: #ff3030;
-    border-color: #ff3030;
-
-    box-shadow:
-        0 0 8px rgba(255, 48, 48, .3);
-}
-
-
-/* THINKING */
-
-.status-sign.thinking {
-    color: #ff9d00;
-    border-color: #ff9d00;
-
-    animation:
-        statusPulse 1s infinite alternate;
-}
-
-@keyframes statusPulse {
-
-    from {
-        opacity: .55;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-
-.green-line {
-    height: 2px;
-    margin: 3px 0 18px;
-
-    background: #006b43;
-
-    box-shadow:
-        0 0 5px #00ff88;
-}
-
-
-/* =========================================================
-   MAGI CHAMBER
-   ========================================================= */
-
-.magi {
-    position: relative;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    grid-template-rows:
-        auto auto;
-
-    grid-template-areas:
-        ". balthasar ."
-        "casper core melchior";
-
-    column-gap: 28px;
-    row-gap: 20px;
-
-    align-items: center;
-    justify-items: center;
-
-    padding: 0 15px;
-
-    isolation: isolate;
-}
-
-
-/* =========================================================
-   TRIANGLE CONNECTION
-   ========================================================= */
-
-.magi-triangle {
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    z-index: 0;
-
-    pointer-events: none;
-
-    overflow: visible;
-
-    filter:
-        drop-shadow(
-            0 0 3px
-            rgba(255, 157, 0, .5)
-        );
-}
-
-.magi-triangle .triangle-main {
-    fill: none;
-
-    stroke: var(--orange);
-
-    stroke-width: .35;
-
-    vector-effect: non-scaling-stroke;
-
-    opacity: .9;
-}
-
-.magi-triangle .triangle-glow {
-    fill: none;
-
-    stroke: var(--orange);
-
-    stroke-width: 1.2;
-
-    vector-effect: non-scaling-stroke;
-
-    opacity: .14;
-}
-
-.magi-triangle .junction {
-    fill: var(--orange);
-
-    filter:
-        drop-shadow(
-            0 0 4px
-            var(--orange)
-        );
-}
-
-
-/* =========================================================
-   MAGI NODE
-   ========================================================= */
-
-.node {
-    position: relative;
-
-    width: 100%;
-    max-width: 320px;
-
-    height: 300px;
-    min-height: 300px;
-
-    padding: 26px 25px 30px;
-
-    background: var(--orange);
-
-    color: #050505;
-
-    clip-path: polygon(
-        0 0,
-        100% 0,
-        100% 70%,
-        82% 100%,
-        18% 100%,
-        0 70%
-    );
-
-    transition:
-        filter .2s,
-        transform .2s;
-
-    z-index: 2;
-}
-
-
-/* Cyan inner surface */
-
-.node::after {
-    content: "";
-
-    position: absolute;
-
-    inset: 4px;
-
-    background: var(--cyan);
-
-    clip-path: polygon(
-        0 0,
-        100% 0,
-        100% 69.5%,
-        81.5% 96.5%,
-        18.5% 96.5%,
-        0 69.5%
-    );
-
-    z-index: 0;
-
-    pointer-events: none;
-}
-
-
-/* CRT lines */
-
-.node::before {
-    content: "";
-
-    position: absolute;
-
-    inset: 10px;
-
-    opacity: .07;
-
-    pointer-events: none;
-
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent 0,
-            transparent 5px,
-            #000 6px
-        );
-
-    clip-path: polygon(
-        0 0,
-        100% 0,
-        100% 68%,
-        81% 95%,
-        19% 95%,
-        0 68%
-    );
-
-    z-index: 1;
-}
-
-
-/* =========================================================
-   POSITIONS
-   ========================================================= */
-
-#balthasar {
-    grid-area: balthasar;
-    justify-self: center;
-}
-
-#casper {
-    grid-area: casper;
-}
-
-#melchior {
-    grid-area: melchior;
-}
-
-
-/* =========================================================
-   NODE CONTENT
-   ========================================================= */
-
-.node-header,
-.status,
-.reason,
-.confidence {
-    position: relative;
-    z-index: 5;
-}
-
-
-/* =========================================================
-   MAGI HEADER
-   ========================================================= */
-
-.node-header {
-    display: flex;
-
-    align-items: baseline;
-    justify-content: space-between;
-
-    gap: 10px;
-
-    border-bottom: 2px solid #111;
-
-    padding-bottom: 8px;
-}
-
-.name {
-    color: #050505;
-
-    font-size: 1.25rem;
-    line-height: 1.1;
-
-    font-weight: 900;
-
-    letter-spacing: -.05em;
-}
-
-.role {
-    color: #111;
-
-    font-size: .62rem;
-
-    font-weight: bold;
-
-    letter-spacing: .14em;
-
-    white-space: nowrap;
-}
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-.status {
-    margin-top: 34px;
-
-    text-align: center;
-
-    font-size: 2rem;
-
-    line-height: 1;
-
-    font-weight: 900;
-
-    color: #050505;
-}
-
-
-/* =========================================================
-   REASONING
-   ========================================================= */
-
-.reason {
-    height: 83px;
-
-    margin-top: 24px;
-
-    padding-right: 8px;
-
-    color: #111;
-
-    font-size: .76rem;
-
-    line-height: 1.35;
-
-    font-weight: bold;
-
-    overflow-y: auto;
-
-    overflow-wrap: anywhere;
-
-    scrollbar-width: thin;
-
-    scrollbar-color:
-        rgba(0,0,0,.45)
-        transparent;
-}
-
-.reason::-webkit-scrollbar {
-    width: 4px;
-}
-
-.reason::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,.4);
-}
-
-
-/* =========================================================
-   CONFIDENCE
-   ========================================================= */
-
-.confidence {
-    margin-top: 9px;
-    margin-left: 25%;
-
-    color: #222;
-
-    font-size: .72rem;
-
-    font-weight: bold;
-}
-
-
-/* =========================================================
-   CENTRAL MAGI CORE
-   ========================================================= */
-
-.magi-core {
-    grid-area: core;
-
-    position: relative;
-
-    width: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 8px;
-
-    color: var(--orange);
-
-    pointer-events: none;
-
-    z-index: 3;
-}
-
-.core-line {
-    width: 100%;
-    height: 3px;
-
-    background: var(--orange);
-
-    box-shadow:
-        0 0 8px var(--orange);
-}
-
-.core-label {
-    color: var(--orange);
-
-    font-family: Georgia, serif;
-
-    font-size: 2rem;
-
-    font-weight: bold;
-
-    text-shadow:
-        0 0 10px var(--orange);
-}
-
-
-/* =========================================================
-   ACTIVE STATES
-   ========================================================= */
-
-.node.thinking {
-    animation:
-        magiPulse 1s infinite alternate;
-
-    filter:
-        brightness(1.1)
-        drop-shadow(
-            0 0 12px
-            var(--orange)
-        );
-}
-
-.node.voted {
-    filter:
-        brightness(1.15)
-        drop-shadow(
-            0 0 15px
-            var(--orange)
-        );
-}
-
-@keyframes magiPulse {
-
-    from {
-        filter:
-            brightness(.85)
-            drop-shadow(
-                0 0 2px
-                var(--orange)
-            );
-    }
-
-    to {
-        filter:
-            brightness(1.25)
-            drop-shadow(
-                0 0 20px
-                var(--orange)
-            );
-    }
-}
-
-
-/* =========================================================
-   CASE SUMMARY
-   ========================================================= */
-
-.case-summary {
-    width: min(900px, 94%);
-
-    margin: 24px auto 0;
-
-    background: #030303;
-
-    border-top:
-        1px solid var(--orange-dark);
-
-    border-bottom:
-        1px solid var(--orange-dark);
-}
-
-
-/* QUESTION */
-
-.case-question {
-    padding: 13px 18px;
-
-    border-bottom: 1px solid #333;
-}
-
-.case-label {
-    color: #555;
-
-    font-size: .62rem;
-
-    letter-spacing: .3em;
-
-    margin-bottom: 7px;
-}
-
-.case-question-text {
-    color: var(--orange);
-
-    font-size: .86rem;
-
-    line-height: 1.4;
-
-    font-weight: bold;
-
-    overflow-wrap: anywhere;
-}
-
-
-/* CONCLUSION */
-
-.case-conclusion {
-    padding: 15px;
-
-    text-align: center;
-}
-
-.case-conclusion-label {
-    color: #555;
-
-    font-size: .62rem;
-
-    letter-spacing: .3em;
-}
-
-.case-conclusion-value {
-    margin-top: 6px;
-
-    font-size: 2.7rem;
-
-    line-height: 1;
-
-    font-weight: bold;
-}
-
-.case-conclusion-votes {
-    margin-top: 7px;
-
-    color: #555;
-
-    font-size: .72rem;
-}
-
-
-/* =========================================================
-   TERMINAL
-   ========================================================= */
-
-.bottom-terminal {
-    border-top:
-        1px solid var(--orange-dark);
-
-    margin-top: 14px;
-
-    padding-top: 7px;
-
-    color: var(--orange);
-
-    font-size: .72rem;
-}
-
-.terminal-row {
-    display: grid;
-
-    grid-template-columns:
-        80px 1fr;
-
-    gap: 8px;
-
-    margin: 3px 0;
-}
-
-.terminal-input {
-    min-height: 20px;
-
-    padding: 3px 7px;
-
-    overflow: hidden;
-
-    white-space: nowrap;
-
-    border: 1px solid #777;
-
-    background: #050505;
-
-    color: var(--orange);
-}
-
-
-/* =========================================================
-   QUESTION INPUT
-   ========================================================= */
-
-.question {
-    display: grid;
-
-    grid-template-columns:
-        80px
-        1fr
-        auto;
-
-    gap: 8px;
-
-    align-items: center;
-
-    margin-top: 8px;
-}
-
-.question label {
-    color: var(--orange);
-
-    font-size: .72rem;
-}
-
-.question input {
-    width: 100%;
-
-    padding: 7px;
-
-    outline: none;
-
-    border: 1px solid var(--orange-dark);
-
-    background: #050505;
-
-    color: var(--orange);
-
-    font: inherit;
-
-    font-size: .72rem;
-}
-
-.question input:focus {
-    border-color: var(--orange);
-
-    box-shadow:
-        0 0 8px
-        rgba(255,157,0,.3);
-}
-
-button {
-    padding: 7px 18px;
-
-    border: 1px solid var(--orange);
-
-    background: #080808;
-
-    color: var(--orange);
-
-    font: inherit;
-
-    font-size: .72rem;
-
-    letter-spacing: .1em;
-
-    cursor: pointer;
-}
-
-button:hover {
-    background: #201300;
-
-    box-shadow:
-        0 0 10px
-        rgba(255,157,0,.25);
-}
-
-button:disabled {
-    opacity: .4;
-
-    cursor: wait;
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 800px) {
-
-    .header {
-        grid-template-columns: 1fr;
-    }
-
-    .header-panel {
-        min-height: 55px;
-        font-size: 2rem;
-    }
-
-    .header-panel.left,
-    .header-panel.right {
-        justify-content: center;
-        padding: 0;
-    }
-
-    .header-center {
-        display: none;
-    }
-
-    .system-info {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .system-info-right {
-        justify-content: flex-start;
-    }
-
-    .magi {
-        display: flex;
-
-        flex-direction: column;
-
-        gap: 18px;
-
-        padding: 10px;
-    }
-
-    .magi-triangle {
-        display: none;
-    }
-
-    .node {
-        width: 100%;
-
-        max-width: 320px;
-
-        height: 300px;
-
-        min-height: 300px;
-    }
-
-    .magi-core {
-        width: min(320px, 100%);
-
-        min-height: 70px;
-
-        order: 4;
-    }
-
-    .question {
-        grid-template-columns: 1fr;
-    }
-
-    .question label {
-        display: none;
-    }
-
-    button {
-        padding: 12px;
-    }
-}
-
-</style>
-</head>
-
-
-<body>
-
-<div class="container">
-
-
-    <!-- =====================================================
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/static/styles.css" />
+
+        <title>MAGI SYSTEM</title>
+    </head>
+
+    <body>
+        <div class="container">
+            <!-- =====================================================
          HEADER
          ===================================================== -->
 
-    <header class="header">
+            <header class="header">
+                <div class="header-panel left">質 問</div>
 
-        <div class="header-panel left">
-            質 問
-        </div>
+                <div class="header-center">MAGI DECISION SUPPORT SYSTEM</div>
 
-        <div class="header-center">
-            MAGI DECISION SUPPORT SYSTEM
-        </div>
+                <div class="header-panel right">解 決</div>
+            </header>
 
-        <div class="header-panel right">
-            解 決
-        </div>
-
-    </header>
-
-
-    <!-- =====================================================
+            <!-- =====================================================
          SYSTEM FRAME
          ===================================================== -->
 
-    <main class="system-frame">
-
-
-        <!-- =================================================
+            <main class="system-frame">
+                <!-- =================================================
              SYSTEM INFO
              ================================================= -->
 
-        <div class="system-info">
+                <div class="system-info">
+                    <div>
+                        CODE: 473<br />
+                        FILE: MAGI_SYS<br />
+                        EXTENSION: 3023<br />
+                        PRIORITY: AAA
+                    </div>
 
-            <div>
-                CODE: 473<br>
-                FILE: MAGI_SYS<br>
-                EXTENSION: 3023<br>
-                PRIORITY: AAA
-            </div>
+                    <!-- Evangelion-style status placard -->
 
+                    <div class="system-info-right">
+                        <div class="status-sign" id="system-sign">
+                            <span class="status-sign-jp"> 情報 </span>
 
-            <!-- Evangelion-style status placard -->
-
-            <div class="system-info-right">
-
-                <div
-                    class="status-sign"
-                    id="system-sign"
-                >
-
-                    <span class="status-sign-jp">
-                        情報
-                    </span>
-
-                    <span
-                        class="status-sign-value"
-                        id="system-sign-value"
-                    >
-                        STANDBY
-                    </span>
-
+                            <span
+                                class="status-sign-value"
+                                id="system-sign-value"
+                            >
+                                STANDBY
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
-            </div>
+                <div class="green-line"></div>
 
-        </div>
-
-
-        <div class="green-line"></div>
-
-
-        <!-- =================================================
+                <!-- =================================================
              MAGI CHAMBER
              ================================================= -->
 
-        <section class="magi">
+                <section class="magi">
+                    <!-- Triangle connecting the three MAGI -->
 
+                    <svg
+                        class="magi-triangle"
+                        viewBox="0 0 100 100"
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
+                    >
+                        <polyline
+                            class="triangle-glow"
+                            points="50,23 17,76 83,76 50,23"
+                        />
 
-            <!-- Triangle connecting the three MAGI -->
+                        <polyline
+                            class="triangle-main"
+                            points="50,23 17,76 83,76 50,23"
+                        />
 
-            <svg
-                class="magi-triangle"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-            >
+                        <circle class="junction" cx="50" cy="23" r=".9" />
 
-                <polyline
-                    class="triangle-glow"
-                    points="50,23 17,76 83,76 50,23"
-                />
+                        <circle class="junction" cx="17" cy="76" r=".9" />
 
-                <polyline
-                    class="triangle-main"
-                    points="50,23 17,76 83,76 50,23"
-                />
+                        <circle class="junction" cx="83" cy="76" r=".9" />
+                    </svg>
 
-                <circle
-                    class="junction"
-                    cx="50"
-                    cy="23"
-                    r=".9"
-                />
-
-                <circle
-                    class="junction"
-                    cx="17"
-                    cy="76"
-                    r=".9"
-                />
-
-                <circle
-                    class="junction"
-                    cx="83"
-                    cy="76"
-                    r=".9"
-                />
-
-            </svg>
-
-
-            <!-- =================================================
+                    <!-- =================================================
                  BALTHASAR
                  ================================================= -->
 
-            <div
-                class="node"
-                id="balthasar"
-            >
+                    <div class="node" id="balthasar">
+                        <div class="node-header">
+                            <span class="name"> BALTHASAR • 2 </span>
 
-                <div class="node-header">
+                            <span class="role"> PRACTICAL </span>
+                        </div>
 
-                    <span class="name">
-                        BALTHASAR • 2
-                    </span>
+                        <div class="status" id="balthasar-status">STANDBY</div>
 
-                    <span class="role">
-                        PRACTICAL
-                    </span>
+                        <div class="reason" id="balthasar-reason">
+                            Awaiting proposition.
+                        </div>
 
-                </div>
+                        <div class="confidence" id="balthasar-confidence"></div>
+                    </div>
 
-
-                <div
-                    class="status"
-                    id="balthasar-status"
-                >
-                    STANDBY
-                </div>
-
-
-                <div
-                    class="reason"
-                    id="balthasar-reason"
-                >
-                    Awaiting proposition.
-                </div>
-
-
-                <div
-                    class="confidence"
-                    id="balthasar-confidence"
-                ></div>
-
-            </div>
-
-
-            <!-- =================================================
+                    <!-- =================================================
                  CASPER
                  ================================================= -->
 
-            <div
-                class="node"
-                id="casper"
-            >
+                    <div class="node" id="casper">
+                        <div class="node-header">
+                            <span class="name"> CASPER • 3 </span>
 
-                <div class="node-header">
+                            <span class="role"> ETHICS </span>
+                        </div>
 
-                    <span class="name">
-                        CASPER • 3
-                    </span>
+                        <div class="status" id="casper-status">STANDBY</div>
 
-                    <span class="role">
-                        ETHICS
-                    </span>
+                        <div class="reason" id="casper-reason">
+                            Awaiting proposition.
+                        </div>
 
-                </div>
+                        <div class="confidence" id="casper-confidence"></div>
+                    </div>
 
-
-                <div
-                    class="status"
-                    id="casper-status"
-                >
-                    STANDBY
-                </div>
-
-
-                <div
-                    class="reason"
-                    id="casper-reason"
-                >
-                    Awaiting proposition.
-                </div>
-
-
-                <div
-                    class="confidence"
-                    id="casper-confidence"
-                ></div>
-
-            </div>
-
-
-            <!-- =================================================
+                    <!-- =================================================
                  MELCHIOR
                  ================================================= -->
 
-            <div
-                class="node"
-                id="melchior"
-            >
+                    <div class="node" id="melchior">
+                        <div class="node-header">
+                            <span class="name"> MELCHIOR • 1 </span>
 
-                <div class="node-header">
+                            <span class="role"> LOGIC </span>
+                        </div>
 
-                    <span class="name">
-                        MELCHIOR • 1
-                    </span>
+                        <div class="status" id="melchior-status">STANDBY</div>
 
-                    <span class="role">
-                        LOGIC
-                    </span>
+                        <div class="reason" id="melchior-reason">
+                            Awaiting proposition.
+                        </div>
 
-                </div>
+                        <div class="confidence" id="melchior-confidence"></div>
+                    </div>
 
-
-                <div
-                    class="status"
-                    id="melchior-status"
-                >
-                    STANDBY
-                </div>
-
-
-                <div
-                    class="reason"
-                    id="melchior-reason"
-                >
-                    Awaiting proposition.
-                </div>
-
-
-                <div
-                    class="confidence"
-                    id="melchior-confidence"
-                ></div>
-
-            </div>
-
-
-            <!-- =================================================
+                    <!-- =================================================
                  CENTRAL MAGI CORE
                  ================================================= -->
 
-            <div class="magi-core">
+                    <div class="magi-core">
+                        <div class="core-line"></div>
 
-                <div class="core-line"></div>
+                        <div class="core-label">MAGI</div>
 
-                <div class="core-label">
-                    MAGI
-                </div>
+                        <div class="core-line"></div>
+                    </div>
+                </section>
 
-                <div class="core-line"></div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
+                <!-- =================================================
              CASE SUMMARY
              ================================================= -->
 
-        <section class="case-summary">
+                <section class="case-summary">
+                    <div class="case-question">
+                        <div class="case-label">PROPOSITION / QUESTION</div>
 
-            <div class="case-question">
+                        <div class="case-question-text" id="case-question">
+                            No proposition submitted.
+                        </div>
+                    </div>
 
-                <div class="case-label">
-                    PROPOSITION / QUESTION
-                </div>
+                    <div class="case-conclusion">
+                        <div class="case-conclusion-label">MAGI CONCLUSION</div>
 
-                <div
-                    class="case-question-text"
-                    id="case-question"
-                >
-                    No proposition submitted.
-                </div>
+                        <div class="case-conclusion-value" id="case-decision">
+                            —
+                        </div>
 
-            </div>
+                        <div
+                            class="case-conclusion-votes"
+                            id="case-votes"
+                        ></div>
+                    </div>
+                </section>
 
-
-            <div class="case-conclusion">
-
-                <div class="case-conclusion-label">
-                    MAGI CONCLUSION
-                </div>
-
-                <div
-                    class="case-conclusion-value"
-                    id="case-decision"
-                >
-                    —
-                </div>
-
-                <div
-                    class="case-conclusion-votes"
-                    id="case-votes"
-                ></div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
+                <!-- =================================================
              TERMINAL
              ================================================= -->
 
-        <div class="bottom-terminal">
+                <div class="bottom-terminal">
+                    <div class="terminal-row">
+                        <span> access_code: </span>
 
-            <div class="terminal-row">
-
-                <span>
-                    access_code:
-                </span>
-
-                <div class="terminal-input">
-                    473
+                        <div class="terminal-input">473</div>
+                    </div>
                 </div>
 
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
+                <!-- =================================================
              QUESTION INPUT
              ================================================= -->
 
-        <form
-            class="question"
-            id="form"
-        >
-
-            <label>
-                question:
-            </label>
-
-            <input
-                id="question"
-                placeholder="ENTER PROPOSITION..."
-                autocomplete="off"
-            >
-
-            <button
-                id="submit"
-                type="submit"
-            >
-                INITIATE
-            </button>
-
-        </form>
-
-
-    </main>
-
-</div>
-
-
-<script>
-
- /* =========================================================
-    MAGI CLIENT
-    ========================================================= */
-
- const form =
-     document.getElementById("form");
-
- const input =
-     document.getElementById("question");
-
- const submit =
-     document.getElementById("submit");
-
-
- const members = [
-     "melchior",
-     "balthasar",
-     "casper"
- ];
-
-
- /* =========================================================
-    SYSTEM STATUS SIGN
-    ========================================================= */
-
- function setSystemSign(status) {
-
-     const sign =
-         document.getElementById(
-             "system-sign"
-         );
-
-     const value =
-         document.getElementById(
-             "system-sign-value"
-         );
-
-
-     sign.classList.remove(
-         "yes",
-         "no",
-         "thinking"
-     );
-
-
-     const normalized =
-         String(status)
-             .toUpperCase();
-
-
-     value.textContent =
-         normalized;
-
-
-     if (
-         normalized === "YES"
-     ) {
-
-         sign.classList.add("yes");
-
-     } else if (
-         normalized === "NO"
-     ) {
-
-         sign.classList.add("no");
-
-     } else if (
-         normalized === "THINKING..." ||
-         normalized === "DELIBERATING..."
-     ) {
-
-         sign.classList.add(
-             "thinking"
-         );
-     }
- }
-
-
- /* =========================================================
-    RESET MEMBER
-    ========================================================= */
-
- function resetMember(id) {
-
-     const node =
-         document.getElementById(id);
-
-     node.classList.remove(
-         "thinking",
-         "voted"
-     );
-
-
-     document.getElementById(
-         id + "-status"
-     ).textContent =
-         "STANDBY";
-
-
-     document.getElementById(
-         id + "-reason"
-     ).textContent =
-         "Awaiting proposition.";
-
-
-     document.getElementById(
-         id + "-confidence"
-     ).textContent =
-         "";
- }
-
-
- /* =========================================================
-    THINKING STATE
-    ========================================================= */
-
- function setThinking(id) {
-
-     const node =
-         document.getElementById(id);
-
-     node.classList.add(
-         "thinking"
-     );
-
-
-     document.getElementById(
-         id + "-status"
-     ).textContent =
-         "THINKING...";
- }
-
-
- /* =========================================================
-    NORMALIZE DECISION
-    ========================================================= */
-
- function normalizeDecision(value) {
-
-     if (!value) {
-         return null;
-     }
-
-
-     const decision =
-         String(value)
-             .trim()
-             .toUpperCase();
-
-
-     if (
-         decision === "YES" ||
-         decision === "NO"
-     ) {
-         return decision;
-     }
-
-
-     return null;
- }
-
-
- /* =========================================================
-    SHOW MEMBER RESULT
-    ========================================================= */
-
- function showResult(result) {
-
-     const id =
-         result.member.toLowerCase();
-
-
-     const node =
-         document.getElementById(id);
-
-
-     const decision =
-         normalizeDecision(
-             result.decision
-         );
-
-
-     node.classList.remove(
-         "thinking"
-     );
-
-     node.classList.add(
-         "voted"
-     );
-
-
-     document.getElementById(
-         id + "-status"
-     ).textContent =
-         decision || "INVALID";
-
-
-     document.getElementById(
-         id + "-reason"
-     ).textContent =
-         result.reason || "";
-
-
-     if (
-         typeof result.confidence ===
-             "number"
-     ) {
-
-         document.getElementById(
-             id + "-confidence"
-         ).textContent =
-             "CONFIDENCE: " +
-             Math.round(
-                 result.confidence * 100
-             ) +
-             "%";
-
-     } else {
-
-         document.getElementById(
-             id + "-confidence"
-         ).textContent =
-             "";
-     }
- }
-
-
- /* =========================================================
-    RESULT COLOR
-    ========================================================= */
-
- function colorDecision(
-     element,
-     decision
- ) {
-
-     element.style.color = "";
-
-     element.style.textShadow = "";
-
-
-     if (decision === "YES") {
-
-         element.style.color =
-             "var(--green)";
-
-         element.style.textShadow =
-             "0 0 20px var(--green)";
-
-     } else if (
-         decision === "NO"
-     ) {
-
-         element.style.color =
-             "var(--red)";
-
-         element.style.textShadow =
-             "0 0 20px var(--red)";
-
-     } else {
-
-         element.style.color =
-             "var(--yellow)";
-
-         element.style.textShadow =
-             "0 0 20px var(--yellow)";
-     }
- }
-
-
- /* =========================================================
-    SUBMIT
-    ========================================================= */
-
- form.addEventListener(
-     "submit",
-     async (event) => {
-
-         event.preventDefault();
-
-
-         const question =
-             input.value.trim();
-
-
-         if (!question) {
-             return;
-         }
-
-
-         submit.disabled = true;
-
-         submit.textContent =
-             "DELIBERATING...";
-
-
-         /* -----------------------------------------------
-            RESET
-            ----------------------------------------------- */
-
-         members.forEach(
-             resetMember
-         );
-
-         members.forEach(
-             setThinking
-         );
-
-
-         /*
-          * Status placard:
-          * green = YES
-          * red   = NO
-          * orange = processing
-          */
-
-         setSystemSign(
-             "THINKING..."
-         );
-
-
-         /* -----------------------------------------------
-            QUESTION
-            ----------------------------------------------- */
-
-         document.getElementById(
-             "case-question"
-         ).textContent =
-             question;
-
-
-         document.getElementById(
-             "case-decision"
-         ).textContent =
-             "DELIBERATING...";
-
-
-         document.getElementById(
-             "case-decision"
-         ).style.color =
-             "";
-
-
-         document.getElementById(
-             "case-decision"
-         ).style.textShadow =
-             "";
-
-
-         document.getElementById(
-             "case-votes"
-         ).textContent =
-             "";
-
-
-         /* -----------------------------------------------
-            API
-            ----------------------------------------------- */
-
-         try {
-
-             const response =
-                 await fetch(
-                     "/api/decide",
-                     {
-                         method: "POST",
-
-                         headers: {
-                             "Content-Type":
-                             "application/json"
-                         },
-
-                         body:
-                            JSON.stringify({
-                                question
-                            })
-                     }
-                 );
-
-
-             if (!response.ok) {
-
-                 throw new Error(
-                     `HTTP ${response.status}`
-                 );
-             }
-
-
-             const data =
-                 await response.json();
-
-
-             if (data.error) {
-
-                 throw new Error(
-                     data.error
-                 );
-             }
-
-
-             /* -------------------------------------------
-                MEMBER RESULTS
-                ------------------------------------------- */
-
-             data.members.forEach(
-                 showResult
-             );
-
-
-             /* -------------------------------------------
-                COUNT ACTUAL MEMBER VOTES
-                ------------------------------------------- */
-
-             const normalizedMembers =
-                 data.members.map(
-                     member => ({
-                         ...member,
-
-                         decision:
-                            normalizeDecision(
-                                member.decision
-                            )
-                     })
-                 );
-
-
-             const yes =
-                 normalizedMembers.filter(
-                     member =>
-                         member.decision ===
-                             "YES"
-                 ).length;
-
-
-             const no =
-                 normalizedMembers.filter(
-                     member =>
-                         member.decision ===
-                             "NO"
-                 ).length;
-
-
-             /* -------------------------------------------
-                MAGI CONSENSUS
-                ------------------------------------------- */
-
-             let finalDecision;
-
-
-             if (yes > no) {
-
-                 finalDecision =
-                     "YES";
-
-             } else if (no > yes) {
-
-                 finalDecision =
-                     "NO";
-
-             } else {
-
-                 finalDecision =
-                     "UNRESOLVED";
-             }
-
-
-             /* -------------------------------------------
-                FINAL CONCLUSION
-                ------------------------------------------- */
-
-             const conclusion =
-                 document.getElementById(
-                     "case-decision"
-                 );
-
-
-             conclusion.textContent =
-                 finalDecision;
-
-
-             colorDecision(
-                 conclusion,
-                 finalDecision
-             );
-
-
-             document.getElementById(
-                 "case-votes"
-             ).textContent =
-                 `${yes} YES / ${no} NO`;
-
-
-             /*
-              * Update the Evangelion-style status sign.
-              */
-
-             setSystemSign(
-                 finalDecision
-             );
-
-
-             /* -------------------------------------------
-                BACKEND CONSISTENCY CHECK
-                ------------------------------------------- */
-
-             if (
-                 data.decision &&
-                 normalizeDecision(
-                     data.decision
-                 ) !== finalDecision
-             ) {
-
-                 console.warn(
-                     "MAGI backend consensus differs from member votes:",
-                     data.decision,
-                     finalDecision
-                 );
-             }
-
-
-         } catch (error) {
-
-             console.error(error);
-
-
-             const conclusion =
-                 document.getElementById(
-                     "case-decision"
-                 );
-
-
-             conclusion.textContent =
-                 "SYSTEM ERROR";
-
-
-             conclusion.style.color =
-                 "var(--red)";
-
-
-             conclusion.style.textShadow =
-                 "0 0 20px var(--red)";
-
-
-             document.getElementById(
-                 "case-votes"
-             ).textContent =
-                 error.message;
-
-
-             /*
-              * System failure gets the red sign too.
-              */
-
-             setSystemSign("NO");
-
-         } finally {
-
-             submit.disabled = false;
-
-             submit.textContent =
-                 "INITIATE";
-         }
-
-     }
- );
-
-
- /* =========================================================
-    INITIAL STATE
-    ========================================================= */
-
- setSystemSign("STANDBY");
-
-</script>
-
-</body>
+                <form class="question" id="form">
+                    <label> question: </label>
+
+                    <input
+                        id="question"
+                        placeholder="ENTER PROPOSITION..."
+                        autocomplete="off"
+                    />
+
+                    <button id="submit" type="submit">INITIATE</button>
+                </form>
+            </main>
+        </div>
+
+        <script src="/static/script.js"></script>
+    </body>
 </html>

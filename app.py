@@ -1,33 +1,52 @@
 import asyncio
 import json
 import os
+import sys
 from pathlib import Path
+from typing import TypedDict
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from openai import AsyncOpenAI
 from pydantic import BaseModel
 
+## Python 3.14 check
+if sys.version_info[:2] != (3, 14):
+    raise RuntimeError(
+        f"This project requires Python 3.14, found {sys.version.split()[0]}"
+    )
+
+## read .env file
+load_dotenv()
+
 app = FastAPI(title="MAGI")
 
-client = AsyncOpenAI(
-    base_url="http://localhost:1234/v1",
-    api_key="lm-studio",
-)
+MODEL = os.getenv("MODEL_ID")
+
+# ---------------------------------------------------------
+# TYPE DEFINITIONS
+# ---------------------------------------------------------
+
+
+class MemberConfig(TypedDict):
+    """Defines the structure for a single MAGI member's configuration."""
+
+    name: str
+    role: str
+    color: str
+    prompt: str
 
 
 # ---------------------------------------------------------
-# CONFIGURATION
+# MEMBER DEFINITIONS
 # ---------------------------------------------------------
 
-# Put the exact model identifier shown by LM Studio here.
-MODEL = os.getenv(
-    "MAGI_MODEL",
-    "your-model-id-here",
-)
 
-MAGI = {
-    "melchior": {
+def define_melchior() -> MemberConfig:
+    """Defines the configuration for Melchior."""
+    return {
         "name": "MELCHIOR",
         "role": "LOGIC",
         "color": "#ff3030",
@@ -54,9 +73,12 @@ Return ONLY valid JSON in this exact format:
   "reason": "short explanation"
 }
 """,
-    },
+    }
 
-    "balthasar": {
+
+def define_balthasar() -> MemberConfig:
+    """Defines the configuration for Balthasar."""
+    return {
         "name": "BALTHASAR",
         "role": "PRACTICAL",
         "color": "#ff9d00",
@@ -84,9 +106,12 @@ Return ONLY valid JSON in this exact format:
   "reason": "short explanation"
 }
 """,
-    },
+    }
 
-    "casper": {
+
+def define_casper() -> MemberConfig:
+    """Defines the configuration for Casper."""
+    return {
         "name": "CASPER",
         "role": "ETHICS",
         "color": "#ffe600",
@@ -112,19 +137,74 @@ Return ONLY valid JSON in this exact format:
   "reason": "short explanation"
 }
 """,
-    },
+    }
+
+
+# ---------------------------------------------------------
+# FINAL CONFIGURATION ASSEMBLY
+# ---------------------------------------------------------
+
+MAGI: dict[str, MemberConfig] = {
+    "melchior": define_melchior(),
+    "balthasar": define_balthasar(),
+    "casper": define_casper(),
 }
+
+
+# ---------------------------------------------------------
+# SETUP AND INITIALIZATION
+# ---------------------------------------------------------
+
+
+def setup_client():
+    """Initializes the OpenAI client and validates required environment variables."""
+
+    required_vars = {
+        "MODEL_ID": "The model identifier (e.g., liquid/lfm2.5-1.2b)",
+        "OPEN_AI_BASE_URL": "The base URL for the API endpoint",
+        "OPEN_AI_API_KEY": "The API key or token",
+    }
+
+    print("--- Starting MAGI Setup ---")
+
+    # Check for required variables
+    for var, description in required_vars.items():
+        value = os.getenv(var)
+        if not value:
+            raise ValueError(
+                f"FATAL ERROR: Environment variable '{var}' is missing. {description}"
+            )
+
+    client = AsyncOpenAI(
+        base_url=os.getenv("OPEN_AI_BASE_URL"),
+        api_key=os.getenv("OPEN_AI_API_KEY"),
+    )
+    print("✅ Environment variables loaded successfully.")
+
+    return client
+
+
+try:
+    client = setup_client()
+except ValueError as e:
+    print(e)
+    exit(1)
+
+# Maps URL /static to physical directory ./static
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 # ---------------------------------------------------------
 # API
 # ---------------------------------------------------------
 
+
 class DecisionRequest(BaseModel):
     question: str
 
 
-async def ask_magi(member, question):
+async def ask_magi(member: MemberConfig, question: str) -> dict:
+    """Sends the prompt to the LLM and parses the JSON response."""
     response = await client.chat.completions.create(
         model=MODEL,
         temperature=0.4,
@@ -163,6 +243,7 @@ Make your decision independently.
             "reason": text,
         }
 
+    # Ensure the result dictionary is correctly typed and augmented
     result["member"] = member["name"]
     result["role"] = member["role"]
 
@@ -175,9 +256,7 @@ async def decide(request: DecisionRequest):
     question = request.question.strip()
 
     if not question:
-        return {
-            "error": "No proposition supplied."
-        }
+        return {"error": "No proposition supplied."}
 
     # All three deliberate independently and concurrently.
     results = await asyncio.gather(
@@ -186,15 +265,9 @@ async def decide(request: DecisionRequest):
         ask_magi(MAGI["casper"], question),
     )
 
-    yes = sum(
-        1 for result in results
-        if result["decision"].upper() == "YES"
-    )
+    yes = sum(1 for result in results if result["decision"].upper() == "YES")
 
-    no = sum(
-        1 for result in results
-        if result["decision"].upper() == "NO"
-    )
+    no = sum(1 for result in results if result["decision"].upper() == "NO")
 
     if yes >= 2:
         decision = "YES"
@@ -216,6 +289,4 @@ async def decide(request: DecisionRequest):
 
 @app.get("/")
 async def index():
-    return FileResponse(
-        Path(__file__).parent / "static" / "index.html"
-    )
+    return FileResponse(Path(__file__).parent / "static" / "index.html")

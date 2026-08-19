@@ -23,19 +23,28 @@ ONLY works properly for YES/NO questions.
 - Individual reasoning + confidence
 - Responsive interface
 
-## Run
+## Setup venv
 
-Start the LM Studio local server, then start the project backend and open the provided localhost URL in a browser.
+Python 3.14 recommended
 
 ```bash
-# Indicate the model
-export MAGI_MODEL="liquid/lfm2.5-1.2b"
-
-# Start the python server
-uvicorn app:app --reload
+python3.14 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
-Web interface will be at `http://localhost:8000/`
+## Run
+
+#### Add your config to the .env file first!
+
+Start the LM Studio local server.
+
+Then start the APP server:
+```bash
+uvicorn app:app --reload --port 8765
+```
+
+Web interface will be at `http://localhost:8765/`
 
 ## TODO
 
