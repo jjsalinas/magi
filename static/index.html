@@ -11,8 +11,8 @@
     <body>
         <div class="container">
             <!-- =====================================================
-         HEADER
-         ===================================================== -->
+                 HEADER
+                 ===================================================== -->
 
             <header class="header">
                 <div class="header-panel left">質 問</div>
@@ -23,13 +23,13 @@
             </header>
 
             <!-- =====================================================
-         SYSTEM FRAME
-         ===================================================== -->
+                 SYSTEM FRAME
+                 ===================================================== -->
 
             <main class="system-frame">
                 <!-- =================================================
-             SYSTEM INFO
-             ================================================= -->
+                     SYSTEM INFO
+                     ================================================= -->
 
                 <div class="system-info">
                     <div>
@@ -38,8 +38,6 @@
                         EXTENSION: 3023<br />
                         PRIORITY: AAA
                     </div>
-
-                    <!-- Evangelion-style status placard -->
 
                     <div class="system-info-right">
                         <div class="status-sign" id="system-sign">
@@ -58,8 +56,29 @@
                 <div class="green-line"></div>
 
                 <!-- =================================================
-             MAGI CHAMBER
-             ================================================= -->
+                     SESSION STATUS
+                     ================================================= -->
+
+                <section class="session-status">
+                    <div>
+                        SESSION:
+                        <span id="session-id">---</span>
+                    </div>
+
+                    <div>
+                        PHASE:
+                        <span id="session-phase">STANDBY</span>
+                    </div>
+
+                    <!--<div>
+                        ROUND:
+                        <span id="session-round">0 / 0</span>
+                    </div>-->
+                </section>
+
+                <!-- =================================================
+                     MAGI CHAMBER
+                     ================================================= -->
 
                 <section class="magi">
                     <!-- Triangle connecting the three MAGI -->
@@ -88,8 +107,8 @@
                     </svg>
 
                     <!-- =================================================
-                 BALTHASAR
-                 ================================================= -->
+                         BALTHASAR
+                         ================================================= -->
 
                     <div class="node" id="balthasar">
                         <div class="node-header">
@@ -101,15 +120,15 @@
                         <div class="status" id="balthasar-status">STANDBY</div>
 
                         <div class="reason" id="balthasar-reason">
-                            Awaiting proposition.
+                            Awaiting question.
                         </div>
 
                         <div class="confidence" id="balthasar-confidence"></div>
                     </div>
 
                     <!-- =================================================
-                 CASPER
-                 ================================================= -->
+                         CASPER
+                         ================================================= -->
 
                     <div class="node" id="casper">
                         <div class="node-header">
@@ -121,15 +140,15 @@
                         <div class="status" id="casper-status">STANDBY</div>
 
                         <div class="reason" id="casper-reason">
-                            Awaiting proposition.
+                            Awaiting question.
                         </div>
 
                         <div class="confidence" id="casper-confidence"></div>
                     </div>
 
                     <!-- =================================================
-                 MELCHIOR
-                 ================================================= -->
+                         MELCHIOR
+                         ================================================= -->
 
                     <div class="node" id="melchior">
                         <div class="node-header">
@@ -141,15 +160,15 @@
                         <div class="status" id="melchior-status">STANDBY</div>
 
                         <div class="reason" id="melchior-reason">
-                            Awaiting proposition.
+                            Awaiting question.
                         </div>
 
                         <div class="confidence" id="melchior-confidence"></div>
                     </div>
 
                     <!-- =================================================
-                 CENTRAL MAGI CORE
-                 ================================================= -->
+                         CENTRAL MAGI CORE
+                         ================================================= -->
 
                     <div class="magi-core">
                         <div class="core-line"></div>
@@ -161,10 +180,12 @@
                 </section>
 
                 <!-- =================================================
-             CASE SUMMARY
-             ================================================= -->
+                     CASE SUMMARY
+                     ================================================= -->
 
-                <section class="case-summary">
+                <section class="case-summary" id="case-summary">
+                    <!-- QUESTION -->
+
                     <div class="case-question">
                         <div class="case-label">PROPOSITION / QUESTION</div>
 
@@ -172,6 +193,10 @@
                             No proposition submitted.
                         </div>
                     </div>
+
+                    <!-- =================================================
+                         PRIMARY CONCLUSION
+                         ================================================= -->
 
                     <div class="case-conclusion">
                         <div class="case-conclusion-label">MAGI CONCLUSION</div>
@@ -185,32 +210,32 @@
                             id="case-votes"
                         ></div>
                     </div>
-                </section>
 
                 <!-- =================================================
-             TERMINAL
-             ================================================= -->
+                     TERMINAL
+                     ================================================= -->
 
                 <div class="bottom-terminal">
                     <div class="terminal-row">
                         <span> access_code: </span>
 
-                        <div class="terminal-input">473</div>
+                        <div class="terminal-input">473$$19772 \(^-^)/</div>
                     </div>
                 </div>
 
                 <!-- =================================================
-             QUESTION INPUT
-             ================================================= -->
+                     QUESTION INPUT
+                     ================================================= -->
 
                 <form class="question" id="form">
                     <label> question: </label>
 
-                    <input
+                    <textarea
                         id="question"
-                        placeholder="ENTER PROPOSITION..."
-                        autocomplete="off"
-                    />
+                        placeholder="ENTER QUESTION..."
+                        contenteditable="false"
+                    ></textarea>
+
 
                     <button id="submit" type="submit">INITIATE</button>
                 </form>

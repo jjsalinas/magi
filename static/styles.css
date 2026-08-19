@@ -3,9 +3,12 @@
     --orange-dark: #8a4e00;
     --cyan: #45afd0;
     --green: #00ff88;
+    --green-dark: #007a4a;
     --red: #ff3030;
+    --red-dark: #7a1010;
     --yellow: #ffe600;
     --black: #050505;
+    --panel: #030303;
 }
 
 * {
@@ -24,6 +27,10 @@ body {
     font-family: "Courier New", monospace;
     overflow-x: hidden;
 }
+
+/* =========================================================
+   CRT / SCANLINE OVERLAY
+   ========================================================= */
 
 body::before {
     content: "";
@@ -71,7 +78,9 @@ body::after {
     width: min(1200px, 96vw);
     margin: 10px auto;
     padding: 12px;
+
     border: 2px solid var(--orange);
+
     position: relative;
 
     background: linear-gradient(
@@ -86,7 +95,9 @@ body::after {
     content: "";
     position: absolute;
     inset: 5px;
+
     border: 1px solid var(--orange-dark);
+
     pointer-events: none;
     z-index: 20;
 }
@@ -97,14 +108,18 @@ body::after {
 
 .header {
     position: relative;
+
     display: grid;
     grid-template-columns: 1fr 1.4fr 1fr;
+
     gap: 8px;
+
     margin-bottom: 8px;
 }
 
 .header-panel {
     min-height: 80px;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -117,9 +132,12 @@ body::after {
     font-family: Georgia, serif;
     font-size: clamp(2rem, 5vw, 4rem);
     font-weight: bold;
+
     letter-spacing: 0.08em;
 
-    text-shadow: 0 0 8px rgba(255, 157, 0, 0.5);
+    text-shadow:
+        0 0 8px rgba(255, 157, 0, 0.5),
+        0 0 20px rgba(255, 157, 0, 0.2);
 }
 
 .header-panel.left {
@@ -140,6 +158,7 @@ body::after {
     border: 1px solid #333;
 
     color: #555;
+
     font-size: 0.7rem;
     letter-spacing: 0.3em;
 }
@@ -150,8 +169,11 @@ body::after {
 
 .system-frame {
     position: relative;
+
     border: 1px solid var(--orange-dark);
+
     padding: 18px 15px 10px;
+
     background: linear-gradient(rgba(0, 255, 100, 0.02), rgba(0, 0, 0, 0));
 }
 
@@ -163,9 +185,12 @@ body::after {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+
     color: var(--orange);
+
     font-size: 0.72rem;
     line-height: 1.35;
+
     margin-bottom: 8px;
 }
 
@@ -173,70 +198,128 @@ body::after {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+
     min-height: 58px;
+
     color: #00aaff;
+
     text-align: right;
 }
 
 /* =========================================================
-   EVANGELION-STYLE STATUS SIGN
+   STATUS SIGN
    ========================================================= */
 
 .status-sign {
     display: inline-flex;
     flex-direction: column;
     align-items: stretch;
+
     min-width: 120px;
+
     padding: 5px 8px;
+
     border: 1px solid #00a86b;
+
     outline: 1px solid rgba(0, 168, 107, 0.35);
     outline-offset: 3px;
+
     color: #00d982;
+
     background: rgba(0, 40, 25, 0.18);
+
     text-align: center;
+
     font-weight: bold;
     letter-spacing: 0.08em;
+
     text-shadow: 0 0 6px currentColor;
 
     transition:
         color 0.2s,
         border-color 0.2s,
-        box-shadow 0.2s;
+        box-shadow 0.2s,
+        background 0.2s;
 }
 
 .status-sign-jp {
     padding-bottom: 4px;
+
     border-bottom: 1px solid currentColor;
+
     font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
+
     font-size: 0.9rem;
     line-height: 1;
 }
 
 .status-sign-value {
     padding-top: 5px;
+
     font-size: 0.62rem;
     line-height: 1;
 }
 
 /* YES */
+
 .status-sign.yes {
-    color: #00ff88;
-    border-color: #00ff88;
-    box-shadow: 0 0 8px rgba(0, 255, 136, 0.25);
+    color: var(--green);
+
+    border-color: var(--green);
+
+    background: rgba(0, 80, 45, 0.18);
+
+    box-shadow:
+        0 0 8px rgba(0, 255, 136, 0.35),
+        inset 0 0 12px rgba(0, 255, 136, 0.08);
 }
 
 /* NO */
+
 .status-sign.no {
-    color: #ff3030;
-    border-color: #ff3030;
-    box-shadow: 0 0 8px rgba(255, 48, 48, 0.3);
+    color: var(--red);
+
+    border-color: var(--red);
+
+    background: rgba(100, 0, 0, 0.18);
+
+    box-shadow:
+        0 0 8px rgba(255, 48, 48, 0.35),
+        inset 0 0 12px rgba(255, 48, 48, 0.08);
 }
 
 /* THINKING */
+
 .status-sign.thinking {
-    color: #ff9d00;
-    border-color: #ff9d00;
+    color: var(--orange);
+
+    border-color: var(--orange);
+
     animation: statusPulse 1s infinite alternate;
+}
+
+/* UNRESOLVED */
+
+.status-sign.unresolved {
+    color: var(--yellow);
+
+    border-color: var(--yellow);
+
+    background: rgba(100, 80, 0, 0.08);
+
+    box-shadow:
+        0 0 8px rgba(255, 230, 0, 0.2),
+        inset 0 0 10px rgba(255, 230, 0, 0.05);
+}
+
+/* ERROR */
+
+.status-sign.error {
+    color: var(--red);
+
+    border-color: var(--red);
+
+    animation: statusErrorPulse 0.5s infinite alternate;
 }
 
 @keyframes statusPulse {
@@ -249,11 +332,30 @@ body::after {
     }
 }
 
+@keyframes statusErrorPulse {
+    from {
+        opacity: 0.45;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   GREEN SYSTEM LINE
+   ========================================================= */
+
 .green-line {
     height: 2px;
+
     margin: 3px 0 18px;
+
     background: #006b43;
-    box-shadow: 0 0 5px #00ff88;
+
+    box-shadow:
+        0 0 5px #00ff88,
+        0 0 12px rgba(0, 255, 136, 0.2);
 }
 
 /* =========================================================
@@ -262,81 +364,131 @@ body::after {
 
 .magi {
     position: relative;
+
     display: grid;
+
     grid-template-columns: repeat(3, minmax(0, 1fr));
+
     grid-template-rows: auto auto;
+
     grid-template-areas:
         ". balthasar ."
         "casper core melchior";
-    column-gap: 28px;
-    row-gap: 20px;
+
+    column-gap: 34px;
+    row-gap: 24px;
+
     align-items: center;
     justify-items: center;
-    padding: 0 15px;
+
+    padding: 0 20px;
+
     isolation: isolate;
 }
 
 /* =========================================================
-   TRIANGLE CONNECTION
+   TRIANGLE
    ========================================================= */
 
 .magi-triangle {
     position: absolute;
+
     inset: 0;
+
     width: 100%;
     height: 100%;
+
     z-index: 0;
+
     pointer-events: none;
+
     overflow: visible;
+
     filter: drop-shadow(0 0 3px rgba(255, 157, 0, 0.5));
 }
 
 .magi-triangle .triangle-main {
     fill: none;
+
     stroke: var(--orange);
+
     stroke-width: 0.35;
+
     vector-effect: non-scaling-stroke;
+
     opacity: 0.9;
 }
 
 .magi-triangle .triangle-glow {
     fill: none;
+
     stroke: var(--orange);
+
     stroke-width: 1.2;
+
     vector-effect: non-scaling-stroke;
+
     opacity: 0.14;
 }
 
 .magi-triangle .junction {
     fill: var(--orange);
+
     filter: drop-shadow(0 0 4px var(--orange));
 }
 
 /* =========================================================
    MAGI NODE
    ========================================================= */
+
 .node {
     position: relative;
+
     width: 100%;
-    max-width: 320px;
-    height: 300px;
-    min-height: 300px;
-    padding: 26px 25px 30px;
+
+    /*
+     * Larger than the original.
+     */
+    max-width: 360px;
+
+    height: 330px;
+    min-height: 330px;
+
+    padding: 24px 24px 34px;
+
     background: var(--orange);
+
     color: #050505;
+
+    /*
+     * CRITICAL:
+     * prevents any text from escaping the polygon.
+     */
+    overflow: hidden;
+
     clip-path: polygon(0 0, 100% 0, 100% 70%, 82% 100%, 18% 100%, 0 70%);
+
     transition:
         filter 0.2s,
-        transform 0.2s;
+        transform 0.2s,
+        background 0.2s;
+
     z-index: 2;
 }
 
-/* Cyan inner surface */
+/* =========================================================
+   CYAN INNER SURFACE
+   ========================================================= */
+
 .node::after {
     content: "";
+
     position: absolute;
+
     inset: 4px;
+
     background: var(--cyan);
+
     clip-path: polygon(
         0 0,
         100% 0,
@@ -345,32 +497,46 @@ body::after {
         18.5% 96.5%,
         0 69.5%
     );
+
     z-index: 0;
+
     pointer-events: none;
 }
 
-/* CRT lines */
+/* =========================================================
+   CRT LINES
+   ========================================================= */
+
 .node::before {
     content: "";
+
     position: absolute;
+
     inset: 10px;
+
     opacity: 0.07;
+
     pointer-events: none;
+
     background: repeating-linear-gradient(
         0deg,
         transparent 0,
         transparent 5px,
         #000 6px
     );
+
     clip-path: polygon(0 0, 100% 0, 100% 68%, 81% 95%, 19% 95%, 0 68%);
+
     z-index: 1;
 }
 
 /* =========================================================
    POSITIONS
    ========================================================= */
+
 #balthasar {
     grid-area: balthasar;
+
     justify-self: center;
 }
 
@@ -391,64 +557,113 @@ body::after {
 .reason,
 .confidence {
     position: relative;
+
     z-index: 5;
 }
 
 /* =========================================================
-   MAGI HEADER
+   NODE HEADER
    ========================================================= */
 
 .node-header {
     display: flex;
+
     align-items: baseline;
     justify-content: space-between;
+
     gap: 10px;
+
     border-bottom: 2px solid #111;
+
     padding-bottom: 8px;
 }
 
 .name {
     color: #050505;
-    font-size: 1.25rem;
+
+    font-size: 1.05rem;
     line-height: 1.1;
+
     font-weight: 900;
-    letter-spacing: -0.05em;
+
+    letter-spacing: -0.04em;
+
+    white-space: nowrap;
 }
 
 .role {
     color: #111;
-    font-size: 0.62rem;
+
+    font-size: 0.58rem;
+
     font-weight: bold;
-    letter-spacing: 0.14em;
+
+    letter-spacing: 0.12em;
+
     white-space: nowrap;
 }
 
 /* =========================================================
-   STATUS
+   MEMBER STATUS
    ========================================================= */
+
 .status {
-    margin-top: 34px;
+    margin-top: 22px;
+
     text-align: center;
-    font-size: 2rem;
+
+    font-size: 1.55rem;
+
     line-height: 1;
+
     font-weight: 900;
+
     color: #050505;
+
+    transition:
+        color 0.2s,
+        text-shadow 0.2s;
 }
 
 /* =========================================================
-   REASONING
+   MEMBER REASONING
    ========================================================= */
+
 .reason {
-    height: 83px;
-    margin-top: 24px;
-    padding-right: 8px;
+    /*
+     * This is the most important fix.
+     *
+     * The reason gets a small, controlled viewport instead
+     * of being allowed to dictate the height of the card.
+     */
+    height: 105px;
+
+    margin-top: 17px;
+
+    padding: 10px 8px 10px 0;
+
+    border-top: 1px solid rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+
     color: #111;
-    font-size: 0.76rem;
-    line-height: 1.35;
+
+    /*
+     * Much smaller than before.
+     */
+    font-size: 0.67rem;
+
+    line-height: 1.3;
+
     font-weight: bold;
+
     overflow-y: auto;
+
+    overflow-x: hidden;
+
     overflow-wrap: anywhere;
+
     scrollbar-width: thin;
+
     scrollbar-color: rgba(0, 0, 0, 0.45) transparent;
 }
 
@@ -456,8 +671,12 @@ body::after {
     width: 4px;
 }
 
+.reason::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 .reason::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.45);
 }
 
 /* =========================================================
@@ -465,56 +684,70 @@ body::after {
    ========================================================= */
 
 .confidence {
-    margin-top: 9px;
-    margin-left: 25%;
+    position: absolute;
+
+    right: 25%;
+    bottom: 38px;
+
+    margin: 0;
+
     color: #222;
-    font-size: 0.72rem;
+
+    font-size: 0.62rem;
+
     font-weight: bold;
+
+    z-index: 6;
 }
 
 /* =========================================================
-   CENTRAL MAGI CORE
+   MEMBER YES
    ========================================================= */
 
-.magi-core {
-    grid-area: core;
-    position: relative;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: var(--orange);
-    pointer-events: none;
-    z-index: 3;
+.node.yes {
+    background: var(--green);
+
+    filter: brightness(1.08) drop-shadow(0 0 16px rgba(0, 255, 136, 0.55));
 }
 
-.core-line {
-    width: 100%;
-    height: 3px;
-    background: var(--orange);
-    box-shadow: 0 0 8px var(--orange);
-}
+.node.yes .status {
+    color: #003d27;
 
-.core-label {
-    color: var(--orange);
-    font-family: Georgia, serif;
-    font-size: 2rem;
-    font-weight: bold;
-    text-shadow: 0 0 10px var(--orange);
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.8);
 }
 
 /* =========================================================
-   ACTIVE STATES
+   MEMBER NO
    ========================================================= */
+
+.node.no {
+    background: var(--red);
+
+    filter: brightness(1.05) drop-shadow(0 0 16px rgba(255, 48, 48, 0.5));
+}
+
+.node.no .status {
+    color: #3c0000;
+
+    text-shadow: 0 0 8px rgba(255, 48, 48, 0.8);
+}
+
+/* =========================================================
+   MEMBER UNRESOLVED
+   ========================================================= */
+
+.node.unresolved {
+    filter: brightness(1.05) drop-shadow(0 0 12px rgba(255, 230, 0, 0.3));
+}
+
+/* =========================================================
+   MEMBER THINKING
+   ========================================================= */
+
 .node.thinking {
     animation: magiPulse 1s infinite alternate;
-    filter: brightness(1.1) drop-shadow(0 0 12px var(--orange));
-}
 
-.node.voted {
-    filter: brightness(1.15) drop-shadow(0 0 15px var(--orange));
+    filter: brightness(1.05) drop-shadow(0 0 12px var(--orange));
 }
 
 @keyframes magiPulse {
@@ -523,8 +756,79 @@ body::after {
     }
 
     to {
-        filter: brightness(1.25) drop-shadow(0 0 20px var(--orange));
+        filter: brightness(1.2) drop-shadow(0 0 20px var(--orange));
     }
+}
+
+/* =========================================================
+   MEMBER ERROR
+   ========================================================= */
+
+.node.error {
+    background: var(--red);
+
+    animation: errorPulse 0.5s infinite alternate;
+}
+
+@keyframes errorPulse {
+    from {
+        filter: brightness(0.8) drop-shadow(0 0 4px var(--red));
+    }
+
+    to {
+        filter: brightness(1.2) drop-shadow(0 0 18px var(--red));
+    }
+}
+
+/* =========================================================
+   CENTRAL MAGI CORE
+   ========================================================= */
+
+.magi-core {
+    grid-area: core;
+
+    position: relative;
+
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    color: var(--orange);
+
+    pointer-events: none;
+
+    z-index: 3;
+}
+
+.core-line {
+    width: 100%;
+
+    height: 3px;
+
+    background: var(--orange);
+
+    box-shadow:
+        0 0 8px var(--orange),
+        0 0 15px rgba(255, 157, 0, 0.25);
+}
+
+.core-label {
+    color: var(--orange);
+
+    font-family: Georgia, serif;
+
+    font-size: 2rem;
+
+    font-weight: bold;
+
+    text-shadow: 0 0 10px var(--orange);
 }
 
 /* =========================================================
@@ -533,159 +837,572 @@ body::after {
 
 .case-summary {
     width: min(900px, 94%);
+
     margin: 24px auto 0;
-    background: #030303;
+
+    background: var(--panel);
+
     border-top: 1px solid var(--orange-dark);
     border-bottom: 1px solid var(--orange-dark);
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
 }
 
-/* QUESTION */
+/* =========================================================
+   BINARY YES
+   ========================================================= */
+
+.case-summary.consensus-yes {
+    border-color: var(--green-dark);
+
+    box-shadow: 0 0 18px rgba(0, 255, 136, 0.08);
+}
+
+/* =========================================================
+   BINARY NO
+   ========================================================= */
+
+.case-summary.consensus-no {
+    border-color: var(--red-dark);
+
+    box-shadow: 0 0 18px rgba(255, 48, 48, 0.08);
+}
+
+/* =========================================================
+   QUESTION
+   ========================================================= */
+
 .case-question {
     padding: 13px 18px;
+
     border-bottom: 1px solid #333;
 }
 
 .case-label {
     color: #555;
+
     font-size: 0.62rem;
+
     letter-spacing: 0.3em;
+
     margin-bottom: 7px;
 }
 
 .case-question-text {
     color: var(--orange);
+
     font-size: 0.86rem;
+
     line-height: 1.4;
+
     font-weight: bold;
+
     overflow-wrap: anywhere;
 }
 
-/* CONCLUSION */
+/* =========================================================
+   CONCLUSION
+   ========================================================= */
+
 .case-conclusion {
-    padding: 15px;
+    padding: 18px 15px 20px;
+
     text-align: center;
 }
 
 .case-conclusion-label {
     color: #555;
+
     font-size: 0.62rem;
+
     letter-spacing: 0.3em;
 }
 
 .case-conclusion-value {
-    margin-top: 6px;
-    font-size: 2.7rem;
+    margin-top: 9px;
+
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+
     line-height: 1;
-    font-weight: bold;
+
+    font-weight: 900;
+
+    letter-spacing: 0.04em;
+
+    transition:
+        color 0.2s,
+        text-shadow 0.2s;
+}
+
+/* =========================================================
+   CONCLUSION COLORS
+   ========================================================= */
+
+.case-conclusion-value.decision-yes {
+    color: var(--green);
+
+    text-shadow:
+        0 0 8px var(--green),
+        0 0 25px rgba(0, 255, 136, 0.55);
+}
+
+.case-conclusion-value.decision-no {
+    color: var(--red);
+
+    text-shadow:
+        0 0 8px var(--red),
+        0 0 25px rgba(255, 48, 48, 0.55);
+}
+
+.case-conclusion-value.decision-unresolved {
+    color: var(--yellow);
+
+    text-shadow:
+        0 0 8px var(--yellow),
+        0 0 20px rgba(255, 230, 0, 0.35);
+}
+
+.case-conclusion-value.decision-error {
+    color: var(--red);
+
+    text-shadow:
+        0 0 8px var(--red),
+        0 0 25px rgba(255, 48, 48, 0.6);
 }
 
 .case-conclusion-votes {
-    margin-top: 7px;
+    margin-top: 9px;
+
     color: #555;
+
     font-size: 0.72rem;
+}
+
+/* =========================================================
+   FINAL MAGI ANALYSIS
+   ========================================================= */
+
+.magi-final-analysis {
+    width: min(900px, 94%);
+
+    margin: 14px auto 0;
+
+    padding: 12px 18px 16px;
+
+    border-top: 1px solid var(--orange-dark);
+    border-bottom: 1px solid var(--orange-dark);
+
+    background: linear-gradient(180deg, rgba(255, 157, 0, 0.025), transparent);
+}
+
+.final-analysis-label {
+    color: #555;
+
+    text-align: center;
+
+    font-size: 0.58rem;
+
+    letter-spacing: 0.3em;
+
+    margin-bottom: 10px;
+}
+
+.final-analysis-text {
+    color: var(--yellow);
+
+    text-align: center;
+
+    font-size: clamp(1rem, 1.7vw, 1.45rem);
+
+    line-height: 1.35;
+
+    font-weight: 900;
+
+    overflow-wrap: anywhere;
+
+    text-shadow:
+        0 0 8px rgba(255, 230, 0, 0.7),
+        0 0 20px rgba(255, 230, 0, 0.25);
+}
+
+.final-analysis-text.decision-yes {
+    color: var(--green);
+
+    text-shadow:
+        0 0 8px rgba(0, 255, 136, 0.8),
+        0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.final-analysis-text.decision-no {
+    color: var(--red);
+
+    text-shadow:
+        0 0 8px rgba(255, 48, 48, 0.8),
+        0 0 20px rgba(255, 48, 48, 0.3);
+}
+
+.final-analysis-text.decision-unresolved {
+    color: var(--yellow);
+
+    text-shadow:
+        0 0 8px rgba(255, 230, 0, 0.7),
+        0 0 20px rgba(255, 230, 0, 0.25);
+}
+
+.final-analysis-text.decision-error {
+    color: var(--red);
+}
+
+/* =========================================================
+   FULL DELIBERATION
+   ========================================================= */
+
+.magi-deliberation-panel {
+    width: min(900px, 94%);
+
+    margin: 10px auto 0;
+
+    border-top: 1px solid var(--orange-dark);
+    border-bottom: 1px solid var(--orange-dark);
+
+    background: rgba(0, 0, 0, 0.35);
+}
+
+/* =========================================================
+   DELIBERATION TOGGLE
+   ========================================================= */
+
+.magi-deliberation-toggle {
+    display: grid;
+
+    grid-template-columns: auto 1fr auto;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 9px 12px;
+
+    color: var(--orange);
+
+    cursor: pointer;
+
+    list-style: none;
+
+    font-size: 0.65rem;
+
+    font-weight: bold;
+
+    letter-spacing: 0.12em;
+
+    user-select: none;
+}
+
+.magi-deliberation-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.toggle-arrow {
+    display: inline-block;
+
+    color: var(--orange);
+
+    transition: transform 0.15s ease;
+}
+
+.magi-deliberation-panel[open] .toggle-arrow {
+    transform: rotate(90deg);
+}
+
+.toggle-hint {
+    color: #444;
+
+    font-size: 0.52rem;
+
+    letter-spacing: 0.12em;
+}
+
+/* =========================================================
+   DELIBERATION CONTENT
+   ========================================================= */
+
+.magi-deliberation-content {
+    max-height: 480px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 10px 14px 16px;
+
+    border-top: 1px solid #252525;
+
+    color: #aaa;
+
+    font-size: 0.65rem;
+
+    line-height: 1.35;
+
+    scrollbar-width: thin;
+
+    scrollbar-color: var(--orange-dark) transparent;
+}
+
+.magi-deliberation-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.magi-deliberation-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.magi-deliberation-content::-webkit-scrollbar-thumb {
+    background: var(--orange-dark);
+}
+
+/* =========================================================
+   DELIBERATION ENTRY
+   ========================================================= */
+
+.deliberation-entry {
+    margin-bottom: 14px;
+
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #222;
+}
+
+.deliberation-entry:last-child {
+    margin-bottom: 0;
+
+    border-bottom: 0;
+}
+
+.deliberation-entry-label {
+    margin-bottom: 5px;
+
+    color: var(--orange);
+
+    font-size: 0.58rem;
+
+    font-weight: bold;
+
+    letter-spacing: 0.15em;
+}
+
+.deliberation-entry-body {
+    margin: 0;
+
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
+
+    color: #aaa;
+
+    font-family: "Courier New", monospace;
+
+    font-size: 0.63rem;
+
+    line-height: 1.35;
+}
+
+.deliberation-empty {
+    padding: 12px 0;
+
+    color: #555;
+
+    font-size: 0.65rem;
+
+    text-align: center;
 }
 
 /* =========================================================
    TERMINAL
    ========================================================= */
+
 .bottom-terminal {
     border-top: 1px solid var(--orange-dark);
+
     margin-top: 14px;
+
     padding-top: 7px;
+
     color: var(--orange);
+
     font-size: 0.72rem;
 }
 
 .terminal-row {
     display: grid;
+
     grid-template-columns: 80px 1fr;
+
     gap: 8px;
+
     margin: 3px 0;
 }
 
 .terminal-input {
     min-height: 20px;
+
     padding: 3px 7px;
+
     overflow: hidden;
+
     white-space: nowrap;
+
     border: 1px solid #777;
+
     background: #050505;
+
     color: var(--orange);
 }
 
 /* =========================================================
    QUESTION INPUT
    ========================================================= */
+
 .question {
     display: grid;
+
     grid-template-columns:
         80px
         1fr
         auto;
+
     gap: 8px;
+
     align-items: center;
+
     margin-top: 8px;
 }
 
 .question label {
     color: var(--orange);
+
     font-size: 0.72rem;
 }
 
 .question input {
     width: 100%;
-    overflow-y: scroll;
+
     padding: 7px;
+
     outline: none;
+
     border: 1px solid var(--orange-dark);
+
     background: #050505;
+
     color: var(--orange);
+
     font: inherit;
+
     font-size: 0.72rem;
+}
+
+.question input::placeholder {
+    color: #5f430f;
 }
 
 .question input:focus {
     border-color: var(--orange);
+
+    box-shadow: 0 0 8px rgba(255, 157, 0, 0.3);
+}
+.question textarea {
+    width: 100%;
+    height: 150px;
+    resize: none;
+
+    padding: 7px;
+
+    outline: none;
+
+    border: 1px solid var(--orange-dark);
+
+    background: #050505;
+
+    color: var(--orange);
+
+    font: inherit;
+
+    font-size: 0.72rem;
+}
+
+.question textarea::placeholder {
+    color: #5f430f;
+}
+
+.question textarea:focus {
+    border-color: var(--orange);
+
     box-shadow: 0 0 8px rgba(255, 157, 0, 0.3);
 }
 
 button {
     padding: 7px 18px;
+
     border: 1px solid var(--orange);
+
     background: #080808;
+
     color: var(--orange);
+
     font: inherit;
+
     font-size: 0.72rem;
+
     letter-spacing: 0.1em;
+
     cursor: pointer;
+
+    transition:
+        background 0.15s,
+        box-shadow 0.15s,
+        color 0.15s;
 }
 
-button:hover {
+button:hover:not(:disabled) {
     background: #201300;
+
     box-shadow: 0 0 10px rgba(255, 157, 0, 0.25);
 }
 
 button:disabled {
     opacity: 0.4;
+
     cursor: wait;
 }
 
 /* =========================================================
    MOBILE
    ========================================================= */
+
 @media (max-width: 800px) {
+    .container {
+        width: 98vw;
+
+        margin: 4px auto;
+
+        padding: 8px;
+    }
+
     .header {
         grid-template-columns: 1fr;
     }
 
     .header-panel {
         min-height: 55px;
+
         font-size: 2rem;
     }
 
     .header-panel.left,
     .header-panel.right {
         justify-content: center;
+
         padding: 0;
     }
 
@@ -695,6 +1412,7 @@ button:disabled {
 
     .system-info {
         flex-direction: column;
+
         gap: 15px;
     }
 
@@ -704,8 +1422,11 @@ button:disabled {
 
     .magi {
         display: flex;
+
         flex-direction: column;
+
         gap: 18px;
+
         padding: 10px;
     }
 
@@ -715,14 +1436,24 @@ button:disabled {
 
     .node {
         width: 100%;
-        max-width: 320px;
-        height: 300px;
-        min-height: 300px;
+
+        max-width: 380px;
+
+        height: 315px;
+        min-height: 315px;
+    }
+
+    .reason {
+        height: 100px;
+
+        font-size: 0.66rem;
     }
 
     .magi-core {
         width: min(320px, 100%);
+
         min-height: 70px;
+
         order: 4;
     }
 
@@ -736,5 +1467,69 @@ button:disabled {
 
     button {
         padding: 12px;
+    }
+
+    .case-conclusion-value {
+        font-size: 2.5rem;
+    }
+
+    .final-analysis-text {
+        font-size: 1rem;
+    }
+
+    .magi-deliberation-content {
+        max-height: 400px;
+    }
+
+    .toggle-hint {
+        display: none;
+    }
+}
+
+/* =========================================================
+   VERY SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 450px) {
+    .node {
+        max-width: 100%;
+
+        height: 300px;
+        min-height: 300px;
+
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .name {
+        font-size: 0.95rem;
+    }
+
+    .role {
+        font-size: 0.5rem;
+    }
+
+    .status {
+        font-size: 1.35rem;
+    }
+
+    .reason {
+        height: 95px;
+
+        font-size: 0.62rem;
+    }
+
+    .confidence {
+        right: 20px;
+    }
+
+    .case-question {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .magi-final-analysis {
+        padding-left: 12px;
+        padding-right: 12px;
     }
 }
