@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Build / generated files
+dist/
+build/
+.cache/
+*.log
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local LM Studio / model files
+models/
+*.gguf
+
+# Temporary files
+tmp/
+temp/
+*.tmp
