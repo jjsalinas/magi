@@ -10,6 +10,17 @@ const submit = document.getElementById("submit");
 
 const members = ["melchior", "balthasar", "casper"];
 
+const memberIds = {
+  MELCHIOR: "melchior",
+  "MELCHIOR-01": "melchior",
+
+  BALTHASAR: "balthasar",
+  "BALTHASAR-02": "balthasar",
+
+  CASPER: "casper",
+  "CASPER-03": "casper",
+};
+
 /* =========================================================
    DOM HELPERS
    ========================================================= */
@@ -92,9 +103,7 @@ function isBinaryQuestion(data) {
   const type = normalizeQuestionType(data?.question_type);
 
   return (
-    type === "BINARY" ||
-    type === "YES_NO" ||
-    type === "AFFIRMATIVE_NEGATIVE"
+    type === "BINARY" || type === "YES_NO" || type === "AFFIRMATIVE_NEGATIVE"
   );
 }
 
@@ -110,13 +119,7 @@ function setSystemSign(status) {
     return;
   }
 
-  sign.classList.remove(
-    "yes",
-    "no",
-    "thinking",
-    "unresolved",
-    "complete",
-  );
+  sign.classList.remove("yes", "no", "thinking", "unresolved", "complete");
 
   const normalized = String(status || "").toUpperCase();
 
@@ -192,13 +195,7 @@ function resetMember(id) {
     return;
   }
 
-  node.classList.remove(
-    "thinking",
-    "voted",
-    "yes",
-    "no",
-    "unresolved",
-  );
+  node.classList.remove("thinking", "voted", "yes", "no", "unresolved");
 
   setText(`${id}-status`, "STANDBY");
   setText(`${id}-reason`, "Awaiting proposition.");
@@ -251,10 +248,11 @@ function showResult(result) {
     return;
   }
 
-  const id = String(result.member).toLowerCase();
+  const memberName = String(result.member).trim().toUpperCase();
+  const id = memberIds[memberName];
   const node = el(id);
 
-  if (!node) {
+  if (!id || !node) {
     console.warn("Unknown MAGI member:", result.member);
     return;
   }
@@ -272,24 +270,15 @@ function showResult(result) {
 
   setText(`${id}-status`, decision || "REVIEW");
 
-  setText(
-    `${id}-reason`,
-    result.reason || "No reasoning supplied.",
-  );
+  setText(`${id}-reason`, result.reason || "No reasoning supplied.");
 
   if (
     typeof result.confidence === "number" &&
     Number.isFinite(result.confidence)
   ) {
-    const confidence = Math.max(
-      0,
-      Math.min(1, result.confidence),
-    );
+    const confidence = Math.max(0, Math.min(1, result.confidence));
 
-    setText(
-      `${id}-confidence`,
-      `CONFIDENCE: ${Math.round(confidence * 100)}%`,
-    );
+    setText(`${id}-confidence`, `CONFIDENCE: ${Math.round(confidence * 100)}%`);
   } else {
     setText(`${id}-confidence`, "");
   }
@@ -453,10 +442,7 @@ function showConclusion(data) {
 
   colorDecision(conclusion, decision);
 
-  setText(
-    "case-votes",
-    buildConsensusLabel(data),
-  );
+  setText("case-votes", buildConsensusLabel(data));
 }
 
 /* =========================================================
@@ -478,24 +464,20 @@ function showDeliberationState(data) {
   const sessionElement = el("session-id");
 
   if (sessionElement) {
-    sessionElement.textContent =
-      state.session_id || "---";
+    sessionElement.textContent = state.session_id || "---";
   }
 
   const phaseElement = el("phase");
 
   if (phaseElement) {
-    phaseElement.textContent =
-      phase || "UNKNOWN";
+    phaseElement.textContent = phase || "UNKNOWN";
   }
 
   const roundElement = el("round");
 
   if (roundElement) {
     roundElement.textContent =
-      round !== null
-        ? `${round} / ${maxRounds}`
-        : `0 / ${maxRounds}`;
+      round !== null ? `${round} / ${maxRounds}` : `0 / ${maxRounds}`;
   }
 }
 
@@ -542,21 +524,13 @@ function showError(error) {
     const node = el(id);
 
     if (node) {
-      node.classList.remove(
-        "thinking",
-        "voted",
-        "yes",
-        "no",
-      );
+      node.classList.remove("thinking", "voted", "yes", "no");
 
       node.classList.add("unresolved");
     }
 
     setText(`${id}-status`, "ERROR");
-    setText(
-      `${id}-reason`,
-      "MAGI communication failure.",
-    );
+    setText(`${id}-reason`, "MAGI communication failure.");
     setText(`${id}-confidence`, "");
   });
 
@@ -568,10 +542,7 @@ function showError(error) {
     conclusion.style.textShadow = "0 0 20px var(--red)";
   }
 
-  setText(
-    "case-votes",
-    error?.message || "Unknown system error.",
-  );
+  setText("case-votes", error?.message || "Unknown system error.");
 
   setSystemSign("NO");
 }
@@ -619,10 +590,7 @@ form.addEventListener("submit", async (event) => {
     conclusion.style.textShadow = "";
   }
 
-  setText(
-    "case-votes",
-    "MAGI DELIBERATION IN PROGRESS",
-  );
+  setText("case-votes", "MAGI DELIBERATION IN PROGRESS");
 
   try {
     const response = await fetch("/api/decide", {

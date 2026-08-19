@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
         <link rel="stylesheet" href="/static/styles.css" />
 
         <title>MAGI SYSTEM</title>
@@ -28,10 +29,10 @@
 
             <main class="system-frame">
                 <!-- =================================================
-                     SYSTEM INFO
+                     SYSTEM INFORMATION
                      ================================================= -->
 
-                <div class="system-info">
+                <section class="system-info">
                     <div>
                         CODE: 473<br />
                         FILE: MAGI_SYS<br />
@@ -51,7 +52,11 @@
                             </span>
                         </div>
                     </div>
-                </div>
+                </section>
+
+                <!-- =================================================
+                     SYSTEM LINE
+                     ================================================= -->
 
                 <div class="green-line"></div>
 
@@ -67,21 +72,23 @@
 
                     <div>
                         PHASE:
-                        <span id="session-phase">STANDBY</span>
+                        <span id="phase">STANDBY</span>
                     </div>
 
-                    <!--<div>
+                    <div>
                         ROUND:
-                        <span id="session-round">0 / 0</span>
-                    </div>-->
+                        <span id="round">0 / 5</span>
+                    </div>
                 </section>
 
                 <!-- =================================================
                      MAGI CHAMBER
                      ================================================= -->
 
-                <section class="magi">
-                    <!-- Triangle connecting the three MAGI -->
+                <section class="magi" aria-label="MAGI deliberation chamber">
+                    <!-- =================================================
+                         TRIANGLE CONNECTION
+                         ================================================= -->
 
                     <svg
                         class="magi-triangle"
@@ -110,7 +117,7 @@
                          BALTHASAR
                          ================================================= -->
 
-                    <div class="node" id="balthasar">
+                    <article class="node" id="balthasar">
                         <div class="node-header">
                             <span class="name"> BALTHASAR • 2 </span>
 
@@ -120,17 +127,17 @@
                         <div class="status" id="balthasar-status">STANDBY</div>
 
                         <div class="reason" id="balthasar-reason">
-                            Awaiting question.
+                            Awaiting proposition.
                         </div>
 
                         <div class="confidence" id="balthasar-confidence"></div>
-                    </div>
+                    </article>
 
                     <!-- =================================================
                          CASPER
                          ================================================= -->
 
-                    <div class="node" id="casper">
+                    <article class="node" id="casper">
                         <div class="node-header">
                             <span class="name"> CASPER • 3 </span>
 
@@ -140,17 +147,17 @@
                         <div class="status" id="casper-status">STANDBY</div>
 
                         <div class="reason" id="casper-reason">
-                            Awaiting question.
+                            Awaiting proposition.
                         </div>
 
                         <div class="confidence" id="casper-confidence"></div>
-                    </div>
+                    </article>
 
                     <!-- =================================================
                          MELCHIOR
                          ================================================= -->
 
-                    <div class="node" id="melchior">
+                    <article class="node" id="melchior">
                         <div class="node-header">
                             <span class="name"> MELCHIOR • 1 </span>
 
@@ -160,17 +167,17 @@
                         <div class="status" id="melchior-status">STANDBY</div>
 
                         <div class="reason" id="melchior-reason">
-                            Awaiting question.
+                            Awaiting proposition.
                         </div>
 
                         <div class="confidence" id="melchior-confidence"></div>
-                    </div>
+                    </article>
 
                     <!-- =================================================
                          CENTRAL MAGI CORE
                          ================================================= -->
 
-                    <div class="magi-core">
+                    <div class="magi-core" aria-label="MAGI central core">
                         <div class="core-line"></div>
 
                         <div class="core-label">MAGI</div>
@@ -184,7 +191,9 @@
                      ================================================= -->
 
                 <section class="case-summary" id="case-summary">
-                    <!-- QUESTION -->
+                    <!-- =================================================
+                         QUESTION
+                         ================================================= -->
 
                     <div class="case-question">
                         <div class="case-label">PROPOSITION / QUESTION</div>
@@ -210,37 +219,45 @@
                             id="case-votes"
                         ></div>
                     </div>
+                </section>
 
                 <!-- =================================================
                      TERMINAL
                      ================================================= -->
 
-                <div class="bottom-terminal">
+                <section class="bottom-terminal">
                     <div class="terminal-row">
                         <span> access_code: </span>
 
                         <div class="terminal-input">473$$19772 \(^-^)/</div>
                     </div>
-                </div>
+                </section>
 
                 <!-- =================================================
                      QUESTION INPUT
                      ================================================= -->
 
                 <form class="question" id="form">
-                    <label> question: </label>
+                    <label for="question"> question: </label>
 
                     <textarea
                         id="question"
+                        name="question"
+                        rows="5"
                         placeholder="ENTER QUESTION..."
-                        contenteditable="false"
+                        autocomplete="off"
+                        spellcheck="false"
+                        required
                     ></textarea>
-
 
                     <button id="submit" type="submit">INITIATE</button>
                 </form>
             </main>
         </div>
+
+        <!-- =========================================================
+             MAGI CLIENT
+             ========================================================= -->
 
         <script src="/static/script.js"></script>
     </body>
