@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <link rel="stylesheet" href="/static/styles.css" />
@@ -29,10 +30,10 @@
 
             <main class="system-frame">
                 <!-- =================================================
-                     SYSTEM INFORMATION
+                     SYSTEM INFO
                      ================================================= -->
 
-                <section class="system-info">
+                <div class="system-info">
                     <div>
                         CODE: 473<br />
                         FILE: MAGI_SYS<br />
@@ -52,11 +53,7 @@
                             </span>
                         </div>
                     </div>
-                </section>
-
-                <!-- =================================================
-                     SYSTEM LINE
-                     ================================================= -->
+                </div>
 
                 <div class="green-line"></div>
 
@@ -72,12 +69,12 @@
 
                     <div>
                         PHASE:
-                        <span id="phase">STANDBY</span>
+                        <span id="session-phase">STANDBY</span>
                     </div>
 
                     <div>
                         ROUND:
-                        <span id="round">0 / 5</span>
+                        <span id="session-round">0 / 0</span>
                     </div>
                 </section>
 
@@ -85,9 +82,9 @@
                      MAGI CHAMBER
                      ================================================= -->
 
-                <section class="magi" aria-label="MAGI deliberation chamber">
+                <section class="magi">
                     <!-- =================================================
-                         TRIANGLE CONNECTION
+                         TRIANGLE CONNECTOR
                          ================================================= -->
 
                     <svg
@@ -117,7 +114,55 @@
                          BALTHASAR
                          ================================================= -->
 
-                    <article class="node" id="balthasar">
+                    <div class="node" id="balthasar" data-member="balthasar">
+                        <!-- Confidence visualization layer -->
+
+                        <div
+                            class="confidence-bricks"
+                            id="balthasar-bricks"
+                            aria-hidden="true"
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
                         <div class="node-header">
                             <span class="name"> BALTHASAR • 2 </span>
 
@@ -131,13 +176,61 @@
                         </div>
 
                         <div class="confidence" id="balthasar-confidence"></div>
-                    </article>
+                    </div>
 
                     <!-- =================================================
                          CASPER
                          ================================================= -->
 
-                    <article class="node" id="casper">
+                    <div class="node" id="casper" data-member="casper">
+                        <!-- Confidence visualization layer -->
+
+                        <div
+                            class="confidence-bricks"
+                            id="casper-bricks"
+                            aria-hidden="true"
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
                         <div class="node-header">
                             <span class="name"> CASPER • 3 </span>
 
@@ -151,13 +244,61 @@
                         </div>
 
                         <div class="confidence" id="casper-confidence"></div>
-                    </article>
+                    </div>
 
                     <!-- =================================================
                          MELCHIOR
                          ================================================= -->
 
-                    <article class="node" id="melchior">
+                    <div class="node" id="melchior" data-member="melchior">
+                        <!-- Confidence visualization layer -->
+
+                        <div
+                            class="confidence-bricks"
+                            id="melchior-bricks"
+                            aria-hidden="true"
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
                         <div class="node-header">
                             <span class="name"> MELCHIOR • 1 </span>
 
@@ -171,13 +312,13 @@
                         </div>
 
                         <div class="confidence" id="melchior-confidence"></div>
-                    </article>
+                    </div>
 
                     <!-- =================================================
                          CENTRAL MAGI CORE
                          ================================================= -->
 
-                    <div class="magi-core" aria-label="MAGI central core">
+                    <div class="magi-core">
                         <div class="core-line"></div>
 
                         <div class="core-label">MAGI</div>
@@ -221,21 +362,44 @@
                     </div>
                 </section>
 
-                <!-- =================================================
-                     TERMINAL
-                     ================================================= -->
+                <!-- =====================================================
+                     FULL DELIBERATION ACCORDION
+                     ===================================================== -->
 
-                <section class="bottom-terminal">
+                <details class="magi-deliberation-panel" id="magi-deliberation">
+                    <summary class="magi-deliberation-toggle">
+                        <span class="toggle-arrow" aria-hidden="true"> ▶ </span>
+
+                        <span> MAGI DELIBERATION RECORD </span>
+
+                        <span class="toggle-hint"> SELECT TO EXPAND </span>
+                    </summary>
+
+                    <div
+                        class="magi-deliberation-content"
+                        id="magi-deliberation-content"
+                    >
+                        <div class="deliberation-empty">
+                            No deliberation data available.
+                        </div>
+                    </div>
+                </details>
+
+                <!-- =====================================================
+                     TERMINAL
+                     ===================================================== -->
+
+                <div class="bottom-terminal">
                     <div class="terminal-row">
                         <span> access_code: </span>
 
                         <div class="terminal-input">473$$19772 \(^-^)/</div>
                     </div>
-                </section>
+                </div>
 
-                <!-- =================================================
+                <!-- =====================================================
                      QUESTION INPUT
-                     ================================================= -->
+                     ===================================================== -->
 
                 <form class="question" id="form">
                     <label for="question"> question: </label>
@@ -243,21 +407,14 @@
                     <textarea
                         id="question"
                         name="question"
-                        rows="5"
                         placeholder="ENTER QUESTION..."
-                        autocomplete="off"
-                        spellcheck="false"
-                        required
+                        rows="5"
                     ></textarea>
 
                     <button id="submit" type="submit">INITIATE</button>
                 </form>
             </main>
         </div>
-
-        <!-- =========================================================
-             MAGI CLIENT
-             ========================================================= -->
 
         <script src="/static/script.js"></script>
     </body>
