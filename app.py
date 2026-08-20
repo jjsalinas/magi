@@ -154,6 +154,21 @@ async def run_magi_session(
     if session is None:
         return
 
+    async def on_update(state: dict) -> None:
+        """
+        Copy the latest MAGI engine state into the live API session.
+
+        This is called by the engine whenever a round starts,
+        completes, or the final decision changes.
+        """
+
+        # Make a copy so the API does not accidentally expose
+        # a state object that the engine is currently mutating.
+        session["state"] = {
+            **state,
+            "session_id": session_id,
+        }
+
     try:
         session["status"] = "RUNNING"
 
@@ -165,9 +180,16 @@ async def run_magi_session(
         state = await deliberate(
             client,
             question,
+            on_update=on_update,
+            session_id=session_id,
         )
 
-        session["state"] = state
+        # Final authoritative state.
+        session["state"] = {
+            **state,
+            "session_id": session_id,
+        }
+
         session["status"] = "COMPLETE"
 
         print(
@@ -198,6 +220,7 @@ async def run_magi_session(
             "type": type(exc).__name__,
             "message": str(exc),
         }
+
 
 
 # =============================================================
