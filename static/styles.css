@@ -16,19 +16,16 @@
     --black: #050505;
     --panel: #030303;
 
-    /*
-     * MAGI confidence brick colors.
-     *
-     * These are intentionally darker than the actual YES/NO
-     * member colors. The bricks should read as "signal"
-     * rather than completely recoloring the MAGI.
-     */
     --brick-green: rgba(0, 255, 136, 0.28);
     --brick-green-glow: rgba(0, 255, 136, 0.42);
 
     --brick-red: rgba(255, 48, 48, 0.28);
     --brick-red-glow: rgba(255, 48, 48, 0.42);
 }
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
 
 * {
     box-sizing: border-box;
@@ -48,14 +45,16 @@ body {
 }
 
 /* =========================================================
-   CRT / SCANLINE OVERLAY
+   CRT OVERLAY
    ========================================================= */
 
 body::before {
     content: "";
     position: fixed;
     inset: 0;
+
     pointer-events: none;
+
     opacity: 0.08;
 
     background: repeating-linear-gradient(
@@ -72,7 +71,9 @@ body::after {
     content: "";
     position: fixed;
     inset: 0;
+
     pointer-events: none;
+
     opacity: 0.1;
 
     background: repeating-linear-gradient(
@@ -91,6 +92,14 @@ body::after {
         #000 100%
     );
 
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        #000 0,
+        transparent 30px,
+        transparent calc(100% - 30px),
+        #000 100%
+    );
+
     z-index: 101;
 }
 
@@ -100,12 +109,13 @@ body::after {
 
 .container {
     width: min(1200px, 96vw);
+
     margin: 10px auto;
     padding: 12px;
 
-    border: 2px solid var(--orange);
-
     position: relative;
+
+    border: 2px solid var(--orange);
 
     background: linear-gradient(
         90deg,
@@ -117,12 +127,14 @@ body::after {
 
 .container::before {
     content: "";
+
     position: absolute;
     inset: 5px;
 
     border: 1px solid var(--orange-dark);
 
     pointer-events: none;
+
     z-index: 20;
 }
 
@@ -134,6 +146,7 @@ body::after {
     position: relative;
 
     display: grid;
+
     grid-template-columns: 1fr 1.4fr 1fr;
 
     gap: 8px;
@@ -145,13 +158,14 @@ body::after {
     min-height: 80px;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
-    color: var(--orange);
-
     border-top: 2px solid var(--orange);
     border-bottom: 2px solid var(--orange);
+
+    color: var(--orange);
 
     font-family: Georgia, serif;
     font-size: clamp(2rem, 5vw, 4rem);
@@ -166,16 +180,19 @@ body::after {
 
 .header-panel.left {
     justify-content: flex-start;
+
     padding-left: 35px;
 }
 
 .header-panel.right {
     justify-content: flex-end;
+
     padding-right: 35px;
 }
 
 .header-center {
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -184,6 +201,7 @@ body::after {
     color: #555;
 
     font-size: 0.7rem;
+
     letter-spacing: 0.3em;
 }
 
@@ -194,14 +212,11 @@ body::after {
 .system-frame {
     position: relative;
 
-    border: 1px solid var(--orange-dark);
-
     padding: 18px 15px 10px;
 
-    background: linear-gradient(
-        rgba(0, 255, 100, 0.02),
-        rgba(0, 0, 0, 0)
-    );
+    border: 1px solid var(--orange-dark);
+
+    background: linear-gradient(rgba(0, 255, 100, 0.02), rgba(0, 0, 0, 0));
 }
 
 /* =========================================================
@@ -210,23 +225,25 @@ body::after {
 
 .system-info {
     display: flex;
-    justify-content: space-between;
+
     align-items: flex-start;
+    justify-content: space-between;
+
+    margin-bottom: 8px;
 
     color: var(--orange);
 
     font-size: 0.72rem;
     line-height: 1.35;
-
-    margin-bottom: 8px;
 }
 
 .system-info-right {
+    min-height: 58px;
+
     display: flex;
+
     align-items: center;
     justify-content: flex-end;
-
-    min-height: 58px;
 
     color: #00aaff;
 
@@ -238,11 +255,12 @@ body::after {
    ========================================================= */
 
 .status-sign {
+    min-width: 120px;
+
     display: inline-flex;
+
     flex-direction: column;
     align-items: stretch;
-
-    min-width: 120px;
 
     padding: 5px 8px;
 
@@ -251,13 +269,14 @@ body::after {
     outline: 1px solid rgba(0, 168, 107, 0.35);
     outline-offset: 3px;
 
-    color: #00d982;
-
     background: rgba(0, 40, 25, 0.18);
+
+    color: #00d982;
 
     text-align: center;
 
     font-weight: bold;
+
     letter-spacing: 0.08em;
 
     text-shadow: 0 0 6px currentColor;
@@ -277,6 +296,7 @@ body::after {
     font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
 
     font-size: 0.9rem;
+
     line-height: 1;
 }
 
@@ -284,6 +304,7 @@ body::after {
     padding-top: 5px;
 
     font-size: 0.62rem;
+
     line-height: 1;
 }
 
@@ -485,14 +506,7 @@ body::after {
 
     overflow: hidden;
 
-    clip-path: polygon(
-        0 0,
-        100% 0,
-        100% 70%,
-        82% 100%,
-        18% 100%,
-        0 70%
-    );
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 82% 100%, 18% 100%, 0 70%);
 
     transition:
         filter 0.2s,
@@ -551,20 +565,13 @@ body::after {
         #000 6px
     );
 
-    clip-path: polygon(
-        0 0,
-        100% 0,
-        100% 68%,
-        81% 95%,
-        19% 95%,
-        0 68%
-    );
+    clip-path: polygon(0 0, 100% 0, 100% 68%, 81% 95%, 19% 95%, 0 68%);
 
     z-index: 1;
 }
 
 /* =========================================================
-   POSITIONS
+   NODE POSITIONS
    ========================================================= */
 
 #balthasar {
@@ -606,9 +613,9 @@ body::after {
 
     gap: 10px;
 
-    border-bottom: 2px solid #111;
-
     padding-bottom: 8px;
+
+    border-bottom: 2px solid #111;
 }
 
 .name {
@@ -643,6 +650,8 @@ body::after {
 .status {
     margin-top: 22px;
 
+    color: #050505;
+
     text-align: center;
 
     font-size: 1.55rem;
@@ -650,8 +659,6 @@ body::after {
     line-height: 1;
 
     font-weight: 900;
-
-    color: #050505;
 
     transition:
         color 0.2s,
@@ -687,9 +694,7 @@ body::after {
 
     scrollbar-width: thin;
 
-    scrollbar-color:
-        rgba(0, 0, 0, 0.45)
-        transparent;
+    scrollbar-color: rgba(0, 0, 0, 0.45) transparent;
 }
 
 .reason::-webkit-scrollbar {
@@ -727,32 +732,11 @@ body::after {
 
 /* =========================================================
    CONFIDENCE BRICK FIELD
-   =========================================================
-   This is the intermediate-confidence visualization.
-
-   The bricks sit behind the card content but above the cyan
-   surface.
-
-   They intentionally remain transparent unless activated.
-
-   The JS creates:
-
-       .confidence-bricks
-           .confidence-brick-row
-               .confidence-brick
-               .confidence-brick
-               ...
-
-   The rows are generated bottom-up.
    ========================================================= */
 
 .confidence-bricks {
     position: absolute;
 
-    /*
-     * Keep the field away from the very top of the card.
-     * This makes the header remain crisp and readable.
-     */
     left: 10%;
     right: 10%;
 
@@ -768,25 +752,13 @@ body::after {
 
     gap: 3px;
 
-    /*
-     * Bricks should sit above the cyan surface,
-     * but below all text.
-     */
     z-index: 2;
 
     pointer-events: none;
 
     opacity: 0.95;
 
-    /*
-     * Fade the very top of the brick field slightly.
-     */
-    mask-image: linear-gradient(
-        to top,
-        #000 0%,
-        #000 82%,
-        transparent 100%
-    );
+    mask-image: linear-gradient(to top, #000 0%, #000 82%, transparent 100%);
 
     -webkit-mask-image: linear-gradient(
         to top,
@@ -801,7 +773,7 @@ body::after {
 }
 
 /* =========================================================
-   BRICK ROW
+   CONFIDENCE BRICK ROW
    ========================================================= */
 
 .confidence-brick-row {
@@ -840,68 +812,47 @@ body::after {
 }
 
 /* =========================================================
-   GREEN CONFIDENCE BRICKS
+   YES BRICKS
    ========================================================= */
 
 .confidence-bricks.yes {
-    filter:
-        drop-shadow(
-            0 0 4px
-            rgba(0, 255, 136, 0.18)
-        );
+    filter: drop-shadow(0 0 4px rgba(0, 255, 136, 0.18));
 }
 
-.confidence-bricks.yes
-.confidence-brick.active {
-    background:
-        linear-gradient(
-            90deg,
-            rgba(0, 255, 136, 0.18),
-            rgba(0, 255, 136, 0.32)
-        );
+.confidence-bricks.yes .confidence-brick.active {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 255, 136, 0.18),
+        rgba(0, 255, 136, 0.32)
+    );
 
-    border-color:
-        rgba(0, 255, 136, 0.28);
+    border-color: rgba(0, 255, 136, 0.28);
 
-    box-shadow:
-        inset 0 0 5px
-        rgba(0, 255, 136, 0.12);
+    box-shadow: inset 0 0 5px rgba(0, 255, 136, 0.12);
 }
 
 /* =========================================================
-   RED CONFIDENCE BRICKS
+   NO BRICKS
    ========================================================= */
 
 .confidence-bricks.no {
-    filter:
-        drop-shadow(
-            0 0 4px
-            rgba(255, 48, 48, 0.18)
-        );
+    filter: drop-shadow(0 0 4px rgba(255, 48, 48, 0.18));
 }
 
-.confidence-bricks.no
-.confidence-brick.active {
-    background:
-        linear-gradient(
-            90deg,
-            rgba(255, 48, 48, 0.18),
-            rgba(255, 48, 48, 0.32)
-        );
+.confidence-bricks.no .confidence-brick.active {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 48, 48, 0.18),
+        rgba(255, 48, 48, 0.32)
+    );
 
-    border-color:
-        rgba(255, 48, 48, 0.28);
+    border-color: rgba(255, 48, 48, 0.28);
 
-    box-shadow:
-        inset 0 0 5px
-        rgba(255, 48, 48, 0.12);
+    box-shadow: inset 0 0 5px rgba(255, 48, 48, 0.12);
 }
 
 /* =========================================================
-   HIGH CONFIDENCE BRICK SIGNAL
-   =========================================================
-   Once the signal gets high enough, make the bricks slightly
-   more pronounced without turning the entire card green/red.
+   CONFIDENCE STATE
    ========================================================= */
 
 .node.yes .confidence-bricks {
@@ -923,20 +874,13 @@ body::after {
 .node.yes {
     background: var(--green);
 
-    filter:
-        brightness(1.08)
-        drop-shadow(
-            0 0 16px
-            rgba(0, 255, 136, 0.55)
-        );
+    filter: brightness(1.08) drop-shadow(0 0 16px rgba(0, 255, 136, 0.55));
 }
 
 .node.yes .status {
     color: #003d27;
 
-    text-shadow:
-        0 0 8px
-        rgba(0, 255, 136, 0.8);
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.8);
 }
 
 /* =========================================================
@@ -946,20 +890,13 @@ body::after {
 .node.no {
     background: var(--red);
 
-    filter:
-        brightness(1.05)
-        drop-shadow(
-            0 0 16px
-            rgba(255, 48, 48, 0.5)
-        );
+    filter: brightness(1.05) drop-shadow(0 0 16px rgba(255, 48, 48, 0.5));
 }
 
 .node.no .status {
     color: #3c0000;
 
-    text-shadow:
-        0 0 8px
-        rgba(255, 48, 48, 0.8);
+    text-shadow: 0 0 8px rgba(255, 48, 48, 0.8);
 }
 
 /* =========================================================
@@ -967,12 +904,7 @@ body::after {
    ========================================================= */
 
 .node.unresolved {
-    filter:
-        brightness(1.05)
-        drop-shadow(
-            0 0 12px
-            rgba(255, 230, 0, 0.3)
-        );
+    filter: brightness(1.05) drop-shadow(0 0 12px rgba(255, 230, 0, 0.3));
 }
 
 /* =========================================================
@@ -982,31 +914,16 @@ body::after {
 .node.thinking {
     animation: magiPulse 1s infinite alternate;
 
-    filter:
-        brightness(1.05)
-        drop-shadow(
-            0 0 12px
-            var(--orange)
-        );
+    filter: brightness(1.05) drop-shadow(0 0 12px var(--orange));
 }
 
 @keyframes magiPulse {
     from {
-        filter:
-            brightness(0.85)
-            drop-shadow(
-                0 0 2px
-                var(--orange)
-            );
+        filter: brightness(0.85) drop-shadow(0 0 2px var(--orange));
     }
 
     to {
-        filter:
-            brightness(1.2)
-            drop-shadow(
-                0 0 20px
-                var(--orange)
-            );
+        filter: brightness(1.2) drop-shadow(0 0 20px var(--orange));
     }
 }
 
@@ -1017,27 +934,16 @@ body::after {
 .node.error {
     background: var(--red);
 
-    animation:
-        errorPulse 0.5s infinite alternate;
+    animation: errorPulse 0.5s infinite alternate;
 }
 
 @keyframes errorPulse {
     from {
-        filter:
-            brightness(0.8)
-            drop-shadow(
-                0 0 4px
-                var(--red)
-            );
+        filter: brightness(0.8) drop-shadow(0 0 4px var(--red));
     }
 
     to {
-        filter:
-            brightness(1.2)
-            drop-shadow(
-                0 0 18px
-                var(--red)
-            );
+        filter: brightness(1.2) drop-shadow(0 0 18px var(--red));
     }
 }
 
@@ -1089,8 +995,7 @@ body::after {
 
     font-weight: bold;
 
-    text-shadow:
-        0 0 10px var(--orange);
+    text-shadow: 0 0 10px var(--orange);
 }
 
 /* =========================================================
@@ -1112,32 +1017,20 @@ body::after {
         box-shadow 0.2s;
 }
 
-/* =========================================================
-   BINARY YES
-   ========================================================= */
-
 .case-summary.consensus-yes {
     border-color: var(--green-dark);
 
-    box-shadow:
-        0 0 18px
-        rgba(0, 255, 136, 0.08);
+    box-shadow: 0 0 18px rgba(0, 255, 136, 0.08);
 }
-
-/* =========================================================
-   BINARY NO
-   ========================================================= */
 
 .case-summary.consensus-no {
     border-color: var(--red-dark);
 
-    box-shadow:
-        0 0 18px
-        rgba(255, 48, 48, 0.08);
+    box-shadow: 0 0 18px rgba(255, 48, 48, 0.08);
 }
 
 /* =========================================================
-   QUESTION
+   CASE QUESTION
    ========================================================= */
 
 .case-question {
@@ -1147,13 +1040,13 @@ body::after {
 }
 
 .case-label {
+    margin-bottom: 7px;
+
     color: #555;
 
     font-size: 0.62rem;
 
     letter-spacing: 0.3em;
-
-    margin-bottom: 7px;
 }
 
 .case-question-text {
@@ -1169,7 +1062,7 @@ body::after {
 }
 
 /* =========================================================
-   CONCLUSION
+   CASE CONCLUSION
    ========================================================= */
 
 .case-conclusion {
@@ -1203,7 +1096,7 @@ body::after {
 }
 
 /* =========================================================
-   CONCLUSION COLORS
+   CONCLUSION STATES
    ========================================================= */
 
 .case-conclusion-value.decision-yes {
@@ -1260,15 +1153,12 @@ body::after {
     border-top: 1px solid var(--orange-dark);
     border-bottom: 1px solid var(--orange-dark);
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255, 157, 0, 0.025),
-            transparent
-        );
+    background: linear-gradient(180deg, rgba(255, 157, 0, 0.025), transparent);
 }
 
 .final-analysis-label {
+    margin-bottom: 10px;
+
     color: #555;
 
     text-align: center;
@@ -1276,8 +1166,6 @@ body::after {
     font-size: 0.58rem;
 
     letter-spacing: 0.3em;
-
-    margin-bottom: 10px;
 }
 
 .final-analysis-text {
@@ -1338,8 +1226,7 @@ body::after {
     border-top: 1px solid var(--orange-dark);
     border-bottom: 1px solid var(--orange-dark);
 
-    background:
-        rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.35);
 }
 
 /* =========================================================
@@ -1377,8 +1264,7 @@ body::after {
 }
 
 .magi-deliberation-toggle:hover {
-    background:
-        rgba(255, 157, 0, 0.045);
+    background: rgba(255, 157, 0, 0.045);
 }
 
 .magi-deliberation-toggle::-webkit-details-marker {
@@ -1390,12 +1276,10 @@ body::after {
 
     color: var(--orange);
 
-    transition:
-        transform 0.15s ease;
+    transition: transform 0.15s ease;
 }
 
-.magi-deliberation-panel[open]
-.toggle-arrow {
+.magi-deliberation-panel[open] .toggle-arrow {
     transform: rotate(90deg);
 }
 
@@ -1429,9 +1313,7 @@ body::after {
 
     scrollbar-width: thin;
 
-    scrollbar-color:
-        var(--orange-dark)
-        transparent;
+    scrollbar-color: var(--orange-dark) transparent;
 }
 
 .magi-deliberation-content::-webkit-scrollbar {
@@ -1479,10 +1361,6 @@ body::after {
 .deliberation-entry-body {
     margin: 0;
 
-    white-space: pre-wrap;
-
-    overflow-wrap: anywhere;
-
     color: #aaa;
 
     font-family: "Courier New", monospace;
@@ -1490,6 +1368,10 @@ body::after {
     font-size: 0.63rem;
 
     line-height: 1.35;
+
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
 }
 
 .deliberation-empty {
@@ -1507,11 +1389,11 @@ body::after {
    ========================================================= */
 
 .bottom-terminal {
-    border-top: 1px solid var(--orange-dark);
-
     margin-top: 14px;
 
     padding-top: 7px;
+
+    border-top: 1px solid var(--orange-dark);
 
     color: var(--orange);
 
@@ -1545,7 +1427,7 @@ body::after {
 }
 
 /* =========================================================
-   QUESTION INPUT
+   QUESTION
    ========================================================= */
 
 .question {
@@ -1594,9 +1476,7 @@ body::after {
 .question input:focus {
     border-color: var(--orange);
 
-    box-shadow:
-        0 0 8px
-        rgba(255, 157, 0, 0.3);
+    box-shadow: 0 0 8px rgba(255, 157, 0, 0.3);
 }
 
 .question textarea {
@@ -1628,13 +1508,11 @@ body::after {
 .question textarea:focus {
     border-color: var(--orange);
 
-    box-shadow:
-        0 0 8px
-        rgba(255, 157, 0, 0.3);
+    box-shadow: 0 0 8px rgba(255, 157, 0, 0.3);
 }
 
 /* =========================================================
-   BUTTON
+   BUTTONS
    ========================================================= */
 
 button {
@@ -1663,9 +1541,7 @@ button {
 button:hover:not(:disabled) {
     background: #201300;
 
-    box-shadow:
-        0 0 10px
-        rgba(255, 157, 0, 0.25);
+    box-shadow: 0 0 10px rgba(255, 157, 0, 0.25);
 }
 
 button:disabled {
@@ -1747,10 +1623,6 @@ button:disabled {
         font-size: 0.66rem;
     }
 
-    /*
-     * Slightly reduce the brick field on mobile so it does not
-     * compete with the text.
-     */
     .confidence-bricks {
         left: 7%;
         right: 7%;
@@ -1787,6 +1659,8 @@ button:disabled {
     }
 
     button {
+        width: 100%;
+
         padding: 12px;
     }
 
@@ -1886,8 +1760,11 @@ button:disabled {
     *::before,
     *::after {
         scroll-behavior: auto !important;
+
         animation-duration: 0.001ms !important;
+
         animation-iteration-count: 1 !important;
+
         transition-duration: 0.001ms !important;
     }
 }

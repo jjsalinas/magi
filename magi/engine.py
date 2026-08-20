@@ -344,6 +344,7 @@ async def deliberate(
     client: AsyncOpenAI,
     question: str,
     on_update: StateUpdateCallback | None = None,
+    session_id: str | None = None,
 ) -> MAGIState:
     """
     Run a complete MAGI session.
@@ -365,7 +366,7 @@ async def deliberate(
     """
 
     state: MAGIState = {
-        "session_id": uuid.uuid4().hex[:8],
+        "session_id": session_id or uuid.uuid4().hex[:8],
         "question": question,
         "phase": "INITIALIZING",
         "round": 0,
