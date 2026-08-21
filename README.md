@@ -48,7 +48,7 @@ The LLMs provide the reasoning and votes; the Python engine controls the deliber
 First, setup your `.env` file (theres a `.env.example` file in the repo)
 
 ```env
-MODEL_ID=your-model
+MODEL_ID=your-model-id
 OPEN_AI_BASE_URL=http://localhost:1234/v1
 OPEN_AI_API_KEY=your-api-key
 
