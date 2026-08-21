@@ -6,6 +6,11 @@
 
 A small **Evangelion-inspired multi-agent decision system** powered by local LLMs via LM Studio.
 
+<img width="auto" height="520" alt="image" src="https://github.com/user-attachments/assets/8a40f493-5816-4f0b-981e-43aefbf32b12" />
+
+<img width="auto" height="520" alt="image" src="https://github.com/user-attachments/assets/78dfca3f-c98a-4206-a1a9-6480e691fa6c" />
+
+
 ### The MAGI
 
 `MELCHIOR-01` — The Scientist: evidence, logic, truth, causality.
