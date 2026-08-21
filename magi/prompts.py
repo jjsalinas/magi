@@ -1,204 +1,187 @@
-"""Builds the per-round prompt sent to each MAGI member."""
+"""Build compact per-round prompts for the MAGI members."""
 
 from .config import MAX_ROUNDS
 from .types import MemberConfig, RoundState
 
-_DIVIDER = "━" * 60
+_DIVIDER = "─" * 48
 
 
-def format_previous_rounds(rounds: list[RoundState], current_round: int) -> str:
-    """Render prior deliberation rounds as a transcript for the next round's prompt."""
+# =============================================================
+# PREVIOUS ROUNDS
+# =============================================================
+def format_previous_rounds(
+    rounds: list[RoundState],
+    current_round: int,
+) -> str:
+    """
+    Create a compact deliberation history.
+
+    Only the latest position and reason from each MAGI are kept.
+    Full historical transcripts are intentionally avoided because
+    they grow rapidly with every round.
+    """
+
     if not rounds:
-        return "NO PREVIOUS DELIBERATION.\nThis is the first independent analysis."
+        return "No previous deliberation."
 
-    sections: list[str] = []
+    # Only send the most recent round.
+    #
+    # The latest round already represents the MAGI's current
+    # understanding of all earlier discussion.
+    previous = rounds[-1]
 
-    for round_state in rounds:
-        if int(round_state.get("round", 0)) >= current_round:
-            continue
+    if int(previous.get("round", 0)) >= current_round:
+        return "No previous deliberation."
 
-        yes = round_state.get("yes", 0)
-        no = round_state.get("no", 0)
+    sections = [
+        f"ROUND {previous.get('round', 0)}",
+        f"VOTE: {previous.get('yes', 0)} YES / {previous.get('no', 0)} NO",
+        _DIVIDER,
+    ]
+
+    for member in previous.get("members", []):
+        reason = str(member.get("reason", "")).strip()
+
+        # Keep previous reasoning deliberately short.
+        reason = reason[:600]
 
         sections.append(
-            f"\n{_DIVIDER}\n"
-            f"ROUND {round_state.get('round', 0)}\n"
-            f"VOTE: {yes} YES / {no} NO\n"
-            f"{_DIVIDER}\n"
+            f"{member.get('member', 'UNKNOWN')}: "
+            f"{member.get('decision', 'UNKNOWN')} "
+            f"({float(member.get('confidence', 0)):.0%})\n"
+            f"{reason}"
         )
-
-        for member in round_state.get("members", []):
-            sections.append(
-                f"\n{member.get('member', 'UNKNOWN')}\n"
-                f"ROLE: {member.get('role', 'UNKNOWN')}\n"
-                f"POSITION: {member.get('decision', 'UNKNOWN')}\n"
-                f"CONFIDENCE: {member.get('confidence', 0):.2f}\n\n"
-                f"ARGUMENT:\n{member.get('reason', '')}\n"
-            )
 
     return "\n".join(sections)
 
 
-def _first_round_prompt(question: str, member: MemberConfig) -> str:
+# =============================================================
+# ROUND 1
+# =============================================================
+def _first_round_prompt(
+    question: str,
+    member: MemberConfig,
+) -> str:
     return f"""
-╔══════════════════════════════════════════════════════════╗
-║                 MAGI DELIBERATION                        ║
-║                 ROUND 1 / {MAX_ROUNDS}                              ║
-║                 INDEPENDENT ANALYSIS                      ║
-╚══════════════════════════════════════════════════════════╝
+MAGI ROUND 1/{MAX_ROUNDS}
 
-QUESTION:
-
+PROPOSITION:
 {question}
 
-You are {member["name"]}.
-Your assigned perspective is {member["role"]}.
+You are {member["name"]}, {member["role"]}.
 
-This is the initial independent analysis.
+This is your independent initial judgment.
+Do not predict the other MAGI.
 
-Do NOT attempt to predict the opinions of the other MAGI.
+Determine whether the proposition should be accepted.
 
-Analyze the proposition independently.
+Return ONLY JSON:
 
-At the end of your analysis you MUST cast a binary vote:
-
-YES or NO.
-
-Your vote is provisional and may be reconsidered during
-later deliberation rounds.
-
-Return ONLY JSON.
+{{
+  "decision": "YES" or "NO",
+  "confidence": 0.0 to 1.0,
+  "reason": "brief justification"
+}}
 """
 
 
+# =============================================================
+# FINAL ROUND
+# =============================================================
 def _final_round_banner() -> str:
     return f"""
-╔══════════════════════════════════════════════════════════╗
-║              FINAL MAGI DETERMINATION                    ║
-║                    ROUND {MAX_ROUNDS} / {MAX_ROUNDS}                           ║
-╚══════════════════════════════════════════════════════════╝
+FINAL MAGI ROUND {MAX_ROUNDS}/{MAX_ROUNDS}
 
-THIS IS THE FINAL ROUND.
+This is the final judgment.
 
-There will be NO ROUND {MAX_ROUNDS + 1}.
-
-The MAGI system MUST reach a final determination after this
-round.
+Review the previous positions.
+Challenge weak reasoning.
+Concede strong reasoning.
+Change your vote only if warranted.
 
 You MUST choose YES or NO.
-
-No abstention is permitted.
-
-No UNRESOLVED result is permitted.
-
-No deferral is permitted.
-
-If disagreement remains, the majority vote of the three
-members becomes the final MAGI determination.
-
-Before voting:
-
-1. Review the complete deliberation.
-2. Identify the strongest argument from each member.
-3. Determine whether your previous position still survives.
-4. Change your vote if warranted.
-5. Cast your FINAL binary vote.
-
-Do not vote for consensus merely because agreement is desirable.
-
-Vote for the position you genuinely judge to be strongest.
 """
 
 
-def _mid_round_banner(current_round: int) -> str:
+# =============================================================
+# MIDDLE ROUND
+# =============================================================
+def _mid_round_banner(
+    current_round: int,
+) -> str:
     return f"""
-╔══════════════════════════════════════════════════════════╗
-║              MAGI DELIBERATION ROUND                    ║
-║                 ROUND {current_round} / {MAX_ROUNDS}                          ║
-╚══════════════════════════════════════════════════════════╝
+MAGI DELIBERATION ROUND {current_round}/{MAX_ROUNDS}
 
-The MAGI members currently disagree.
+Reassess your position using the previous MAGI judgments.
 
-A majority exists, but it is NOT yet sufficient to conclude.
+Ask:
+- What did I miss?
+- What assumption may be wrong?
+- Does another MAGI have a stronger argument?
+- Should I change my vote?
 
-The purpose of this round is to challenge the current
-positions and attempt to reach genuine convergence.
-
-Review the other members' arguments.
-
-Ask yourself:
-
-- Did another member identify something I missed?
-- Is my current reasoning based on an unsupported assumption?
-- Is the majority position actually stronger?
-- Is the minority position exposing a serious flaw?
-- What evidence would justify changing my vote?
-- Does my current position remain defensible?
-
-You MAY change your vote.
-
-You MAY retain your vote.
-
-Do NOT change your vote merely to create agreement.
-
-A binary vote is mandatory.
+Agreement is not required.
+Changing your vote is permitted.
 """
 
 
+# =============================================================
+# BUILD PROMPT
+# =============================================================
 def build_round_instruction(
     question: str,
     current_round: int,
     previous_rounds: list[RoundState],
     member: MemberConfig,
 ) -> str:
-    """Build the full user-turn prompt for one member in one round."""
-    if current_round == 1:
-        return _first_round_prompt(question, member)
+    """
+    Build a compact user prompt.
 
-    banner = _final_round_banner() if current_round == MAX_ROUNDS else _mid_round_banner(current_round)
-    transcript = format_previous_rounds(previous_rounds, current_round)
+    The member's identity and personality remain in the system
+    prompt. This prompt contains only the current proposition and
+    the minimum deliberation context required.
+    """
+
+    if current_round == 1:
+        return _first_round_prompt(
+            question,
+            member,
+        )
+
+    banner = (
+        _final_round_banner()
+        if current_round == MAX_ROUNDS
+        else _mid_round_banner(current_round)
+    )
+
+    history = format_previous_rounds(
+        previous_rounds,
+        current_round,
+    )
 
     return f"""
 {banner}
 
-QUESTION:
-
+PROPOSITION:
 {question}
 
 {_DIVIDER}
-PREVIOUS MAGI DELIBERATION
+PREVIOUS MAGI JUDGMENTS
 {_DIVIDER}
 
-{transcript}
+{history}
 
 {_DIVIDER}
-YOUR ROLE
-{_DIVIDER}
 
-You are {member["name"]}, the {member["role"]} intelligence.
+You are {member["name"]}, {member["role"]}.
 
-Conduct your reassessment through your assigned perspective.
+Give your current judgment.
 
-You are participating in an adversarial but constructive
-deliberation.
-
-The other MAGI are not your enemies.
-
-However, their arguments must survive scrutiny.
-
-Your objective is not unanimity.
-
-Your objective is intellectual integrity.
-
-{_DIVIDER}
-REQUIRED OUTPUT
-{_DIVIDER}
-
-Return ONLY:
+Return ONLY JSON:
 
 {{
   "decision": "YES" or "NO",
-  "confidence": number between 0 and 1,
-  "reason": "concise explanation of your current position"
+  "confidence": 0.0 to 1.0,
+  "reason": "brief justification"
 }}
 """

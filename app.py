@@ -1,18 +1,23 @@
 """
-MAGI DECISION SUPPORT SYSTEM — FastAPI entrypoint.
+MAGI DECISION SUPPORT SYSTEM
+============================
 
-Serves the static frontend and exposes the MAGI session API.
+FastAPI entrypoint for the MAGI deliberation system.
 
-POST /api/decide
-    Starts a new MAGI deliberation and immediately returns a session ID.
+Endpoints:
 
-GET /api/decide/{session_id}
-    Returns the current state of that MAGI session.
+    POST /api/decide
+        Creates a MAGI session and starts deliberation in the
+        background.
 
-The frontend can poll the session endpoint while the MAGI system
-deliberates through its rounds.
+    GET /api/decide/{session_id}
+        Returns the current live state of a MAGI session.
+
+The frontend can poll the session endpoint while MELCHIOR,
+BALTHASAR, and CASPER deliberate.
 
 Run with:
+
     uvicorn app:app --reload
 """
 
@@ -20,6 +25,7 @@ import asyncio
 import sys
 import uuid
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -28,6 +34,7 @@ from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
 from magi.config import (
+    MAX_RESPONSE_TOKENS,
     MAX_ROUNDS,
     MODEL_ID,
     OPEN_AI_API_KEY,
@@ -36,11 +43,13 @@ from magi.config import (
 )
 from magi.engine import deliberate
 
+# =============================================================
+# PYTHON VERSION
+# =============================================================
 
 if sys.version_info[:2] != (3, 14):
     raise RuntimeError(
-        f"This project requires Python 3.14, "
-        f"found {sys.version.split()[0]}"
+        f"This project requires Python 3.14, found {sys.version.split()[0]}"
     )
 
 
@@ -48,12 +57,14 @@ if sys.version_info[:2] != (3, 14):
 # CLIENT
 # =============================================================
 
+
 def setup_client() -> AsyncOpenAI:
-    print(
-        f"\n{'=' * 60}\n"
-        f" MAGI SYSTEM INITIALIZATION\n"
-        f"{'=' * 60}\n"
-    )
+    """
+    Validate the environment and create the OpenAI-compatible
+    async client used by the MAGI engine.
+    """
+
+    print(f"\n{'=' * 60}\n MAGI SYSTEM INITIALIZATION\n{'=' * 60}")
 
     validate_environment()
 
@@ -65,6 +76,7 @@ def setup_client() -> AsyncOpenAI:
     print("ENVIRONMENT ............ ONLINE")
     print(f"MODEL .................. {MODEL_ID}")
     print(f"DELIBERATION LIMIT ..... {MAX_ROUNDS} ROUNDS")
+    print(f"RESPONSE TOKEN LIMIT .. {MAX_RESPONSE_TOKENS} TOKENS")
     print("MELCHIOR ............... ONLINE")
     print("BALTHASAR .............. ONLINE")
     print("CASPER ................. ONLINE")
@@ -86,8 +98,16 @@ except ValueError as exc:
 # =============================================================
 
 app = FastAPI(
-    title="MAGI"
+    title="MAGI",
+    description=(
+        "Three-personality binary deliberation system inspired by the Evangelion MAGI."
+    ),
 )
+
+
+# =============================================================
+# STATIC FILES
+# =============================================================
 
 app.mount(
     "/static",
@@ -100,20 +120,24 @@ app.mount(
 # REQUEST MODEL
 # =============================================================
 
+
 class DecisionRequest(BaseModel):
+    """
+    Request body for a new MAGI deliberation.
+    """
+
     question: str = Field(
-        min_length=1
+        min_length=1,
+        description=("The proposition the MAGI must evaluate as YES or NO."),
     )
 
 
 # =============================================================
-# LIVE SESSION STORAGE
+# SESSION STORAGE
 # =============================================================
 
 """
-Active and recently completed MAGI sessions.
-
-The key is the session ID.
+In-memory MAGI sessions.
 
 Example:
 
@@ -124,29 +148,61 @@ MAGI_SESSIONS["a81f42c1"] = {
     "error": None,
 }
 
-This is intentionally in-memory.
+This is intentionally local and ephemeral.
 
-If the server restarts, the sessions disappear.
-
-That is perfectly fine for this local MAGI application.
+Restarting the server destroys all sessions.
 """
 
-MAGI_SESSIONS: dict[str, dict] = {}
+MAGI_SESSIONS: dict[str, dict[str, Any]] = {}
+
+
+# =============================================================
+# STATE FACTORY
+# =============================================================
+
+
+def create_initial_state(
+    session_id: str,
+    question: str,
+) -> dict[str, Any]:
+    """
+    Create the initial API-visible MAGI state.
+
+    This mirrors the state structure produced by the engine.
+    """
+
+    return {
+        "session_id": session_id,
+        "question": question,
+        "phase": "INITIALIZING",
+        "round": 0,
+        "max_rounds": MAX_ROUNDS,
+        "decision": "PENDING",
+        "determination": None,
+        "consensus": False,
+        "votes": {
+            "yes": 0,
+            "no": 0,
+        },
+        "members": [],
+        "rounds": [],
+    }
 
 
 # =============================================================
 # SESSION WORKER
 # =============================================================
 
+
 async def run_magi_session(
     session_id: str,
     question: str,
 ) -> None:
     """
-    Run the MAGI deliberation in the background.
+    Run one MAGI deliberation in the background.
 
-    The HTTP request that created the session does not wait for
-    this function to finish.
+    The HTTP request that created the session returns immediately;
+    this worker continues running asynchronously.
     """
 
     session = MAGI_SESSIONS.get(session_id)
@@ -154,16 +210,17 @@ async def run_magi_session(
     if session is None:
         return
 
-    async def on_update(state: dict) -> None:
+    async def on_update(
+        state: dict,
+    ) -> None:
         """
-        Copy the latest MAGI engine state into the live API session.
+        Receive live updates from the MAGI engine.
 
-        This is called by the engine whenever a round starts,
-        completes, or the final decision changes.
+        The state is copied before being stored so the API does
+        not retain a reference to an object currently being
+        mutated by the engine.
         """
 
-        # Make a copy so the API does not accidentally expose
-        # a state object that the engine is currently mutating.
         session["state"] = {
             **state,
             "session_id": session_id,
@@ -172,19 +229,19 @@ async def run_magi_session(
     try:
         session["status"] = "RUNNING"
 
-        print(
-            f"\n[SESSION {session_id}] "
-            f"MAGI deliberation started."
-        )
+        print(f"\n[SESSION {session_id}] MAGI DELIBERATION STARTED")
 
         state = await deliberate(
-            client,
-            question,
+            client=client,
+            question=question,
             on_update=on_update,
             session_id=session_id,
         )
 
-        # Final authoritative state.
+        # -----------------------------------------------------
+        # Final authoritative engine state.
+        # -----------------------------------------------------
+
         session["state"] = {
             **state,
             "session_id": session_id,
@@ -192,133 +249,124 @@ async def run_magi_session(
 
         session["status"] = "COMPLETE"
 
+        print(f"\n[SESSION {session_id}] MAGI DELIBERATION COMPLETE")
+
+        print(f"[SESSION {session_id}] DECISION: {state['decision']}")
+
         print(
-            f"\n[SESSION {session_id}] "
-            f"MAGI deliberation complete: "
-            f"{state['decision']}"
+            f"[SESSION {session_id}] "
+            f"DETERMINATION: "
+            f"{state.get('determination', 'UNKNOWN')}"
         )
+
+    except asyncio.CancelledError:
+        """
+        Do not silently turn task cancellation into a normal
+        MAGI failure.
+        """
+
+        session["status"] = "CANCELLED"
+
+        print(f"\n[SESSION {session_id}] MAGI DELIBERATION CANCELLED")
+
+        raise
 
     except Exception as exc:
-        print(
-            f"\n{'=' * 60}\n"
-            f" MAGI SESSION FAILURE\n"
-            f"{'=' * 60}"
-        )
+        print(f"\n{'=' * 60}\n MAGI SESSION FAILURE\n{'=' * 60}")
 
-        print(
-            f"SESSION: {session_id}"
-        )
+        print(f"SESSION : {session_id}")
 
-        print(
-            f"{type(exc).__name__}: {exc}"
-        )
+        print(f"ERROR   : {type(exc).__name__}: {exc}")
 
         print("=" * 60)
 
         session["status"] = "ERROR"
+
         session["error"] = {
             "type": type(exc).__name__,
             "message": str(exc),
         }
 
 
-
 # =============================================================
 # START SESSION
 # =============================================================
+
 
 @app.post("/api/decide")
 async def decide(
     request: DecisionRequest,
 ):
     """
-    Start a MAGI deliberation.
+    Start a new MAGI deliberation.
 
-    IMPORTANT:
-    This endpoint does NOT wait for the MAGI system to finish.
+    Returns immediately with a session ID.
 
-    It creates a session and returns immediately.
+    The client should poll:
+
+        GET /api/decide/{session_id}
+
+    until the session reaches COMPLETE or ERROR.
     """
 
     question = request.question.strip()
 
     if not question:
-        return {
-            "error": "No question supplied."
-        }
+        return {"error": "No question supplied."}
 
     # ---------------------------------------------------------
     # Create session ID.
     # ---------------------------------------------------------
-
     session_id = uuid.uuid4().hex[:8]
 
     # ---------------------------------------------------------
-    # Initial session state.
+    # Create initial state.
     # ---------------------------------------------------------
+    initial_state = create_initial_state(
+        session_id=session_id,
+        question=question,
+    )
 
     MAGI_SESSIONS[session_id] = {
         "status": "STARTING",
         "question": question,
-        "state": {
-            "session_id": session_id,
-            "question": question,
-            "phase": "INITIALIZING",
-            "round": 0,
-            "max_rounds": MAX_ROUNDS,
-            "decision": "PENDING",
-            "votes": {
-                "yes": 0,
-                "no": 0,
-            },
-            "members": [],
-            "rounds": [],
-        },
+        "state": initial_state,
         "error": None,
     }
 
-    print(
-        f"\n{'=' * 60}\n"
-        f" MAGI SESSION CREATED\n"
-        f"{'=' * 60}"
-    )
+    print(f"\n{'=' * 60}\n MAGI SESSION CREATED\n{'=' * 60}")
 
-    print(
-        f" SESSION : {session_id}"
-    )
+    print(f" SESSION : {session_id}")
 
-    print(
-        f" QUESTION: {question}"
-    )
+    print(f" QUESTION: {question}")
 
     print("=" * 60)
 
     # ---------------------------------------------------------
-    # Start deliberation without blocking this request.
+    # Start background deliberation.
     # ---------------------------------------------------------
-
     asyncio.create_task(
         run_magi_session(
-            session_id,
-            question,
+            session_id=session_id,
+            question=question,
         )
     )
 
     # ---------------------------------------------------------
     # Return immediately.
     # ---------------------------------------------------------
-
     return {
         "session_id": session_id,
         "status": "STARTING",
         "question": question,
-        "state": MAGI_SESSIONS[session_id]["state"],
+        "state": initial_state,
     }
 
 
 # =============================================================
-# POLL SESSION
+# GET SESSION
 # =============================================================
+
 
 @app.get("/api/decide/{session_id}")
 async def get_decision(
@@ -327,7 +375,8 @@ async def get_decision(
     """
     Return the current state of a MAGI session.
 
-    The frontend polls this endpoint while deliberation is running.
+    This endpoint is intentionally simple so a frontend can poll
+    it repeatedly during deliberation.
     """
 
     session = MAGI_SESSIONS.get(session_id)
@@ -338,55 +387,56 @@ async def get_decision(
             "session_id": session_id,
         }
 
+    state = session.get(
+        "state",
+        {},
+    )
+
     response = {
         "session_id": session_id,
         "status": session["status"],
         "question": session["question"],
-        "state": session["state"],
-    }
-
-    # ---------------------------------------------------------
-    # Completed MAGI state.
-    # ---------------------------------------------------------
-
-    state = session.get("state") or {}
-
-    if state:
-        response.update(
+        "state": state,
+        # -----------------------------------------------------
+        # Convenience fields for the frontend.
+        # -----------------------------------------------------
+        "decision": state.get(
+            "decision",
+            "PENDING",
+        ),
+        "determination": state.get(
+            "determination",
+            None,
+        ),
+        "consensus": state.get(
+            "consensus",
+            False,
+        ),
+        "votes": state.get(
+            "votes",
             {
-                "decision": state.get(
-                    "decision",
-                    "PENDING",
-                ),
-                "votes": state.get(
-                    "votes",
-                    {
-                        "yes": 0,
-                        "no": 0,
-                    },
-                ),
-                "members": state.get(
-                    "members",
-                    [],
-                ),
-                "rounds": state.get(
-                    "rounds",
-                    [],
-                ),
-            }
-        )
+                "yes": 0,
+                "no": 0,
+            },
+        ),
+        "members": state.get(
+            "members",
+            [],
+        ),
+        "rounds": state.get(
+            "rounds",
+            [],
+        ),
+    }
 
     # ---------------------------------------------------------
     # Error information.
     # ---------------------------------------------------------
-
     if session["status"] == "ERROR":
-        response["error"] = (
-            session.get("error")
-            or {
-                "message": "MAGI deliberation failed."
-            }
-        )
+        response["error"] = session.get("error") or {
+            "type": "UnknownError",
+            "message": ("MAGI deliberation failed."),
+        }
 
     return response
 
@@ -395,10 +445,11 @@ async def get_decision(
 # INDEX
 # =============================================================
 
+
 @app.get("/")
 async def index():
-    return FileResponse(
-        Path(__file__).parent
-        / "static"
-        / "index.html"
-    )
+    """
+    Serve the MAGI frontend.
+    """
+
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
