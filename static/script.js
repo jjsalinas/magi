@@ -9,13 +9,11 @@
    4. Frontend begins polling GET /api/decide/{session_id}.
    5. Every poll updates:
       - MAGI member states
-      - confidence brick walls
+      - confidence percentage + bar
       - round / phase
       - deliberation accordion
       - final decision
    6. Polling stops when the backend reports a final state.
-   7. Confidence brick walls dissolve and the original
-      member background is restored.
    ========================================================= */
 
 const form = document.getElementById("form");
@@ -272,25 +270,29 @@ function resetMember(id) {
     "error",
   );
 
-  /*
-   * Remove any previously generated confidence bricks.
-   */
-
-  const bricks = node.querySelector(".confidence-bricks");
-
-  if (bricks) {
-    bricks.innerHTML = "";
-
-    bricks.classList.remove("yes", "no", "building", "cleaning");
-
-    bricks.style.removeProperty("opacity");
-    bricks.style.removeProperty("transform");
-    bricks.style.removeProperty("filter");
-  }
-
   setText(`${id}-status`, "STANDBY");
   setText(`${id}-reason`, "Awaiting proposition.");
-  setText(`${id}-confidence`, "");
+
+  /*
+   * Reset confidence percentage and bar.
+   */
+
+  const confidence = el(`${id}-confidence`);
+
+  if (confidence) {
+    const label = confidence.querySelector(".confidence-label");
+    const fill = confidence.querySelector(".confidence-fill");
+
+    if (label) {
+      label.textContent = "CONFIDENCE: 0%";
+    }
+
+    if (fill) {
+      fill.style.width = "0%";
+    }
+
+    confidence.classList.remove("yes", "no", "unresolved");
+  }
 }
 
 /* =========================================================
@@ -332,50 +334,51 @@ function applyDecisionClass(node, decision) {
 }
 
 /* =========================================================
-   CONFIDENCE BRICK WALL
+   CONFIDENCE BAR
    =========================================================
-   Confidence is represented by a growing brick wall.
+   Confidence is represented by a simple horizontal bar.
 
    0%
-       no bricks
+       empty
 
-   35%
-       roughly half wall
+   50%
+       half filled
 
-   70%+
-       completely filled wall
+   100%
+       completely filled
 
-   The visual deliberately saturates at 70%.
+   The bar follows the actual confidence percentage.
    ========================================================= */
 
-function renderConfidenceBricks(node, decision, confidence) {
-  if (!node) {
+function renderConfidenceBar(id, decision, confidence) {
+  const container = el(`${id}-confidence`);
+
+  if (!container) {
     return;
   }
 
-  let container = node.querySelector(".confidence-bricks");
+  const label = container.querySelector(".confidence-label");
+  const fill = container.querySelector(".confidence-fill");
 
-  if (!container) {
-    container = document.createElement("div");
-
-    container.className = "confidence-bricks";
-
-    node.appendChild(container);
+  if (!label || !fill) {
+    return;
   }
 
   /*
-   * Reset the existing wall.
+   * Reset the confidence color state.
    */
 
-  container.innerHTML = "";
-
-  container.classList.remove("yes", "no", "building", "cleaning");
+  container.classList.remove("yes", "no", "unresolved");
 
   /*
    * Confidence must be a valid number.
    */
 
   if (typeof confidence !== "number" || !Number.isFinite(confidence)) {
+    label.textContent = "CONFIDENCE: --";
+
+    fill.style.width = "0%";
+
     return;
   }
 
@@ -386,164 +389,34 @@ function renderConfidenceBricks(node, decision, confidence) {
   const normalized = Math.max(0, Math.min(1, confidence));
 
   /*
-   * Saturate the visual at 70%.
-
-   * 0.70 confidence = 100% visual wall.
+   * Convert to percentage.
    */
 
-  const fill = Math.min(normalized / 0.7, 1);
+  const percentage = Math.round(normalized * 100);
 
   /*
-   * Only YES and NO receive directional walls.
+   * Update the visible percentage.
    */
 
-  if (decision !== "YES" && decision !== "NO") {
-    return;
+  label.textContent = `CONFIDENCE: ${percentage}%`;
+
+  /*
+   * Update the bar width.
+   */
+
+  fill.style.width = `${percentage}%`;
+
+  /*
+   * Set bar color based on the member decision.
+   */
+
+  if (decision === "YES") {
+    container.classList.add("yes");
+  } else if (decision === "NO") {
+    container.classList.add("no");
+  } else {
+    container.classList.add("unresolved");
   }
-
-  /*
-   * Set wall color.
-   */
-
-  container.classList.add(decision === "YES" ? "yes" : "no");
-
-  container.classList.add("building");
-
-  /*
-   * Brick wall dimensions.
-   */
-
-  const columns = 7;
-  const rows = 8;
-  const total = columns * rows;
-
-  const brickCount = Math.round(fill * total);
-
-  /*
-   * Build the wall from bottom to top.
-
-   * Each row is a real masonry row.
-   */
-
-  for (let row = 0; row < rows; row++) {
-    const rowElement = document.createElement("div");
-
-    rowElement.className = "confidence-brick-row";
-
-    /*
-     * Alternate rows are offset to create
-     * an actual brick-wall pattern.
-     */
-
-    if (row % 2 === 1) {
-      rowElement.classList.add("offset");
-    }
-
-    for (let column = 0; column < columns; column++) {
-      const brick = document.createElement("span");
-
-      brick.className = "confidence-brick";
-
-      brick.classList.add(decision === "YES" ? "brick-yes" : "brick-no");
-
-      /*
-       * Calculate the brick's position from
-       * the bottom of the wall.
-       */
-
-      const visualIndex = row * columns + column;
-
-      if (visualIndex < brickCount) {
-        brick.classList.add("active");
-
-        /*
-         * Stagger the appearance very slightly
-         * so the wall feels constructed rather
-         * than instantly painted in.
-         */
-
-        brick.style.setProperty("--brick-delay", `${visualIndex * 18}ms`);
-      }
-
-      rowElement.appendChild(brick);
-    }
-
-    container.appendChild(rowElement);
-  }
-}
-
-/* =========================================================
-   CONFIDENCE WALL CLEANUP
-   =========================================================
-   Called once deliberation has finished.
-
-   The wall dissolves before the member returns to its
-   original cyan background.
-   ========================================================= */
-
-function cleanupConfidenceBricks() {
-  members.forEach((id) => {
-    const node = el(id);
-
-    if (!node) {
-      return;
-    }
-
-    const bricks = node.querySelector(".confidence-bricks");
-
-    if (!bricks || bricks.children.length === 0) {
-      return;
-    }
-
-    /*
-     * Prevent multiple cleanup animations.
-     */
-
-    if (bricks.classList.contains("cleaning")) {
-      return;
-    }
-
-    /*
-     * Stop the construction state.
-     */
-
-    bricks.classList.remove("building");
-
-    bricks.classList.add("cleaning");
-
-    /*
-     * Get every brick and reverse the order.
-
-     * This gives the impression that the wall
-     * is dissolving from the top down.
-     */
-
-    const brickElements = Array.from(
-      bricks.querySelectorAll(".confidence-brick"),
-    );
-
-    brickElements.reverse().forEach((brick, index) => {
-      brick.style.setProperty("--cleanup-delay", `${index * 22}ms`);
-
-      brick.classList.remove("active");
-
-      brick.classList.add("cleanup");
-    });
-
-    /*
-     * Remove the wall completely after the animation.
-     */
-
-    window.setTimeout(() => {
-      bricks.innerHTML = "";
-
-      bricks.classList.remove("yes", "no", "building", "cleaning");
-
-      bricks.style.removeProperty("opacity");
-      bricks.style.removeProperty("transform");
-      bricks.style.removeProperty("filter");
-    }, 1100);
-  });
 }
 
 /* =========================================================
@@ -618,26 +491,27 @@ function showResult(result) {
 
   applyDecisionClass(node, decision);
 
+  /*
+   * Update member status.
+   */
+
   setText(`${id}-status`, decision || "REVIEW");
+
+  /*
+   * Update member reasoning.
+   */
 
   setText(`${id}-reason`, result.reason || "No reasoning supplied.");
 
   /*
-   * Render confidence and brick wall.
+   * Update confidence percentage and bar.
    */
 
-  if (
-    typeof result.confidence === "number" &&
-    Number.isFinite(result.confidence)
-  ) {
-    const confidence = Math.max(0, Math.min(1, result.confidence));
-
-    setText(`${id}-confidence`, `CONFIDENCE: ${Math.round(confidence * 100)}%`);
-
-    renderConfidenceBricks(node, decision, confidence);
-  } else {
-    setText(`${id}-confidence`, "");
-  }
+  renderConfidenceBar(
+    id,
+    decision,
+    typeof result.confidence === "number" ? result.confidence : null,
+  );
 }
 
 /* =========================================================
@@ -945,9 +819,6 @@ async function pollSession(sessionId) {
 
     /*
      * Every backend snapshot updates the UI.
-     *
-     * This is where the confidence walls grow or
-     * shrink as new member results arrive.
      */
 
     renderResult(data);
@@ -958,15 +829,6 @@ async function pollSession(sessionId) {
 
     if (isSessionFinished(data)) {
       stopPolling();
-
-      /*
-       * Give the final decision a brief moment to
-       * visually settle before dissolving the walls.
-       */
-
-      window.setTimeout(() => {
-        cleanupConfidenceBricks();
-      }, 450);
 
       activeSessionId = null;
 
@@ -1015,27 +877,17 @@ function showError(error) {
       node.classList.remove("thinking", "voted", "yes", "no");
 
       node.classList.add("unresolved", "error");
-
-      const bricks = node.querySelector(".confidence-bricks");
-
-      if (bricks) {
-        bricks.innerHTML = "";
-
-        bricks.classList.remove("yes", "no", "building", "cleaning");
-
-        bricks.style.removeProperty("opacity");
-
-        bricks.style.removeProperty("transform");
-
-        bricks.style.removeProperty("filter");
-      }
     }
 
     setText(`${id}-status`, "ERROR");
 
     setText(`${id}-reason`, "MAGI communication failure.");
 
-    setText(`${id}-confidence`, "");
+    /*
+     * Reset confidence bar on error.
+     */
+
+    renderConfidenceBar(id, "UNRESOLVED", null);
   });
 
   const conclusion = el("case-decision");
@@ -1126,16 +978,6 @@ async function startSession(question) {
    */
 
   if (isSessionFinished(data)) {
-    /*
-     * Still perform the final brick cleanup so that
-     * even an instantly completed session gets the
-     * same visual treatment.
-     */
-
-    window.setTimeout(() => {
-      cleanupConfidenceBricks();
-    }, 450);
-
     activeSessionId = null;
 
     submit.disabled = false;
@@ -1200,9 +1042,8 @@ form.addEventListener("submit", async (event) => {
 
   if (conclusion) {
     conclusion.textContent = "DELIBERATING...";
-
-    conclusion.style.color = "";
-    conclusion.style.textShadow = "";
+    // conclusion.style.color = "";
+    // conclusion.style.textShadow = "";
   }
 
   setText("case-votes", "INITIALIZING MAGI SESSION...");

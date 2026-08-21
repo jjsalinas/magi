@@ -64,7 +64,7 @@ def clamp_confidence(value: Any) -> float:
     """Coerce a raw value into a float in [0, 1], defaulting to 0.5."""
     try:
         confidence = float(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return 0.5
 
     return max(0.0, min(1.0, confidence))
