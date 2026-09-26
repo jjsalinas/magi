@@ -70,9 +70,10 @@ MAX_RESPONSE_TOKENS=300
 Python 3.14 needed
 
 ```bash
-python3.14 -m venv .venv
+# Initial setup only
+uv venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+uv sync
 ```
 
 ## Run
@@ -85,6 +86,9 @@ Then start the APP server:
 
 ```bash
 uvicorn app:app --reload --port 8765
+
+## If not in active venv: 
+# uv run uvicorn app:app --reload --port 8765 
 ```
 
 Web interface will be at `http://localhost:8765/`
@@ -93,3 +97,5 @@ Web interface will be at `http://localhost:8765/`
 
 - More advanced consensus logic
 - Even more MAGI aesthetics
+- Different API for each MAGI node
+
