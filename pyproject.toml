@@ -1,7 +1,17 @@
 [project]
-name="magi"
-version="0.0.1"
-requires-python = "==3.14.*"
+name = "magi"
+version = "0.0.1"
+requires-python = ">=3.14"
+
+
+dependencies = [
+    "fastapi>=0.141.1",
+    "openai>=3.19.2",
+    "pydantic>=2.13.5",
+    "python-dotenv>=1.2.3",
+    "uvicorn[standard]>=0.54.0",
+]
+
 
 [tool.ruff]
 line-length = 88
@@ -13,11 +23,5 @@ indent-style = "space"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
 
-[dependency-groups]
-dev = [
-    "fastapi>=0.141.1",
-    "openai>=3.19.2",
-    "python-dotenv>=1.2.3",
-    "ruff>=0.16.9",
-    "uvicorn[standard]>=0.54.0",
-]
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.16.9"
